@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu App de Coreano Dinâmico</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .modo-btn { cursor: pointer; padding: 2px 8px; border-radius: 4px; border: none; background: none; font-size: 10px; font-weight: bold; color: #666; }
+        .modo-ativo { background: #00664d; color: white !important; }
+        .item-lista { background: #f9f9f9; border: 1px solid #eee; padding: 8px; margin-bottom: 5px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .btn-excluir { background: #ff4d4d; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 5px; }
+        .btn-editar { background: #ffc107; color: #000; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; }
+        .btn-backup { flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #00664d; font-size: 10px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="display-box" id="caixa-pergunta" onclick="revelarDica()" style="cursor: pointer;">
+            <p id="texto-pergunta">SELECIONE UMA PASTA E APERTE PLAY</p>
+            <small id="texto-dica" style="display:none; color: #555;"></small>
+        </div>
+
+        <div class="sub-labels" style="display: flex; justify-content: space-around; margin: 10px 0;">
+            <button class="modo-btn modo-ativo" id="btn-modo-pergunta" onclick="trocarModo('pergunta')">PERGUNTA</button>
+            <span style="font-size: 10px; color: #ccc;">ROMANIZAÇÃO</span>
+            <button class="modo-btn" id="btn-modo-resposta" onclick="trocarModo('resposta')">RESPOSTA</button>
+        </div>
+
+        <div class="display-box" style="position: relative; padding-top: 25px; height: auto; min-height: 120px; display: flex; flex-direction: column; justify-content: center;">
+            <small id="indicador-lingua" style="position: absolute; top: 5px; left: 10px; font-size: 10px; color: #00664d; font-weight: bold;"></small>
+            <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                <input type="text" id="escrita-coreano" placeholder="Escreva em Coreano..." style="width: 90%; margin: 0 auto; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
+                <input type="text" id="escrita-portugues" placeholder="Escreva em Português..." style="width: 90%; margin: 0 auto; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
+            </div>
+        </div>
+
+        <div class="botoes-audio" style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
+            <button onclick="ouvirPergunta()">OUVIR</button>
+            <button onclick="verificarResposta()" style="background: #28a745; color: white;">VERIFICAR</button>
+            <button id="btn-falar" onclick="reconhecerVoz()" style="background: #007bff; color: white;">FALAR</button>
+        </div>
+
+        <div class="footer" style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 30px;">
+            <select id="pasta-treino" onchange="resetarSequencia()" style="padding: 5px; border-radius: 5px; border: 1px solid #00664d; font-size: 10px; font-weight: bold;"></select>
+            <div style="display: flex; justify-content: space-around; width: 100%; align-items: center;">
+                <button onclick="abrirArquivos()">ARQUIVO</button>
+                <div class="btn-central" id="play-btn"></div> 
+                <button onclick="abrirGramatica()">GRAMÁTICA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tela-cadastro" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000;">
+        <div style="background:white; width:90%; margin:5% auto; padding:20px; border-radius:10px; max-height: 85vh; overflow-y: auto;">
+            <h2 id="titulo-arquivo" style="text-align:center; color:#00664d; margin-bottom: 10px;">GERENCIAR ARQUIVOS</h2>
+            
+            <div style="background: #f0f7f5; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                <input type="text" id="cad-pasta-nome" placeholder="Nome da Pasta (ex: DIALOGO 1)" style="width:94%; margin-bottom:8px; padding:8px;">
+                <div style="display: flex; gap: 5px; width: 98%;">
+                   <input type="number" id="cad-ordem" placeholder="Ordem (1, 2...)" style="width:30%; margin-bottom:8px; padding:8px;">
+                   <input type="text" id="cad-coreano" placeholder="Coreano" style="width:70%; margin-bottom:8px; padding:8px;">
+                </div>
+                <input type="text" id="cad-traducao" placeholder="Tradução" style="width:94%; margin-bottom:8px; padding:8px;">
+                <input type="text" id="cad-romanizacao" placeholder="Romanização" style="width:94%; margin-bottom:8px; padding:8px;">
+                <button id="btn-salvar-exercicio" onclick="salvarExercicioDinâmico()" style="width:100%; background:#28a745; color:white; padding:10px; border:none; border-radius:5px; font-weight:bold;">SALVAR EXERCÍCIO</button>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button onclick="exportarDados()" class="btn-backup" style="background: #eefaf6; color: #00664d;">📤 EXPORTAR</button>
+                <button onclick="document.getElementById('input-importar').click()" class="btn-backup" style="background: #fff8e1; color: #856404;">📥 IMPORTAR</button>
+                <input type="file" id="input-importar" style="display:none" onchange="importarDados(this)">
+            </div>
+
+            <hr>
+            <div id="visualizacao-arquivos" style="margin-top:10px;"></div>
+            <button onclick="fecharCadastro()" style="width:100%; background:#ccc; padding:10px; border:none; border-radius:5px; margin-top:10px;">VOLTAR</button>
+        </div>
+    </div>
+
+    <div id="tela-gramatica" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000;">
+        <div style="background:white; width:90%; margin:5% auto; padding:20px; border-radius:10px; max-height: 80vh; overflow-y: auto;">
+            <h2 style="text-align:center; color:#00664d;">MINHA GRAMÁTICA</h2>
+            <input type="text" id="gram-titulo" placeholder="Nome da Pasta" style="width:94%; margin-bottom:10px; padding:8px;">
+            <textarea id="gram-texto" style="width:94%; height:80px; padding:8px;" placeholder="Explicação..."></textarea>
+            <button onclick="salvarNovaGramatica()" style="width:100%; background:#28a745; color:white; padding:10px; border-radius:5px;">SALVAR NOTA</button>
+            <div id="lista-gramatica" style="margin-top:15px;"></div>
+            <button onclick="fecharGramatica()" style="width:100%; background:#ccc; padding:10px; margin-top:10px; border-radius:5px;">FECHAR</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

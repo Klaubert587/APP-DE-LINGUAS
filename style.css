@@ -1,0 +1,91 @@
+/* Configuração Geral do Fundo */
+body {
+    background-color: #00664d; /* Verde escuro do seu projeto */
+    display: flex;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* As Caixas de Texto (Verde Água) */
+.display-box {
+    background-color: #d1f7ec;
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    background: transparent;
+    border: none;
+    text-align: center;
+    font-size: 18px;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    color: #004d3d;
+}
+
+/* Rótulos e Botões Auxiliares */
+.sub-labels, .botoes-audio {
+    display: flex;
+    justify-content: space-around;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* O Botão Central com a SUA LOGO (SVG) */
+.btn-central {
+    width: 75px;
+    height: 75px;
+    background: radial-gradient(circle, #222, #000); /* Fundo preto circular */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 4px solid #111;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 255, 150, 0.4);
+    
+    /* Inserindo sua logo via código (SVG) */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 50 Q30 20 50 5 Q70 20 50 50 Q80 30 95 50 Q80 70 50 50 Q70 80 50 95 Q30 80 50 50 Q20 70 5 50 Q20 30 50 50" fill="none" stroke="%2300ffcc" stroke-width="4"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 65%;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+button {
+    background-color: #d1f7ec;
+    border: 1px solid #999;
+    padding: 5px 12px;
+    font-weight: bold;
+    border-radius: 4px;
+    color: #004d3d;
+    cursor: pointer;
+}
