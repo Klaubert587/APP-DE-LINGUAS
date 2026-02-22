@@ -6,32 +6,62 @@
     <title>Meu App de Coreano Dinâmico</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        
         .modo-btn { cursor: pointer; padding: 2px 8px; border-radius: 4px; border: none; background: none; font-size: 10px; font-weight: bold; color: #666; }
         .modo-ativo { background: #00664d; color: white !important; }
         .item-lista { background: #f9f9f9; border: 1px solid #eee; padding: 8px; margin-bottom: 5px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
         .btn-excluir { background: #ff4d4d; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 5px; }
         .btn-editar { background: #ffc107; color: #000; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; }
         .btn-backup { flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #00664d; font-size: 10px; font-weight: bold; cursor: pointer; }
+        /* Estilo para as palavras clicáveis */
+        .palavra-clicavel { cursor: pointer; display: inline-block; padding: 2px; }
+        .palavra-clicavel:active { background-color: #e0e0e0; border-radius: 3px; }
     </style>
+
+    <style>
+        .modo-btn { 
+            cursor: pointer; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            border: none; 
+            background: none; 
+            font-size: 10px; 
+            font-weight: bold; 
+            color: rgba(255, 255, 255, 0.7) !important; /* Deixa o texto claro */
+        }
+        .modo-ativo { 
+            background: #00664d; 
+            color: white !important; 
+            border: 1px solid white; /* Destaque ao ativo */
+        }
+        /* ... mantenha os outros estilos abaixo (item-lista, btn-excluir, etc) ... */
+    </style>
+
 </head>
 <body>
     <div class="container">
-        <div class="display-box" id="caixa-pergunta" onclick="revelarDica()" style="cursor: pointer;">
-            <p id="texto-pergunta">SELECIONE UMA PASTA E APERTE PLAY</p>
-            <small id="texto-dica" style="display:none; color: #555;"></small>
+        <div class="display-box" id="caixa-pergunta" style="min-height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px;">
+            <div id="texto-pergunta" style="font-weight: bold; font-size: 1.8em; text-align: center; line-height: 1.2; width: 100%; word-wrap: break-word;">SELECIONE UMA PASTA E APERTE PLAY</div>
+            
+            <small id="texto-dica" style="display:none; color: #444; margin-top: 15px; font-style: italic; font-size: 1.1em; text-align: center; font-weight: bold;"></small>
         </div>
 
-        <div class="sub-labels" style="display: flex; justify-content: space-around; margin: 10px 0;">
+        <div class="sub-labels" style="display: flex; justify-content: space-around; margin: 10px 0; align-items: center;">
             <button class="modo-btn modo-ativo" id="btn-modo-pergunta" onclick="trocarModo('pergunta')">PERGUNTA</button>
-            <span style="font-size: 10px; color: #ccc;">ROMANIZAÇÃO</span>
+            <span id="label-romanizacao" style="font-size: 10px; color: #b1c7c2; font-weight: bold; cursor: pointer; border-bottom: 1px dashed #00664d;">ROMANIZAÇÃO</span>
             <button class="modo-btn" id="btn-modo-resposta" onclick="trocarModo('resposta')">RESPOSTA</button>
         </div>
 
         <div class="display-box" style="position: relative; padding-top: 25px; height: auto; min-height: 120px; display: flex; flex-direction: column; justify-content: center;">
             <small id="indicador-lingua" style="position: absolute; top: 5px; left: 10px; font-size: 10px; color: #00664d; font-weight: bold;"></small>
+            
             <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
                 <input type="text" id="escrita-coreano" placeholder="Escreva em Coreano..." style="width: 90%; margin: 0 auto; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
-                <input type="text" id="escrita-portugues" placeholder="Escreva em Português..." style="width: 90%; margin: 0 auto; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
+                
+                <div style="width: 90%; margin: 0 auto; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="chk-usar-portugues" title="Habilitar escrita em português">
+                    <input type="text" id="escrita-portugues" placeholder="Escreva em Português..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px; background-color: #f0f0f0;" disabled>
+                </div>
             </div>
         </div>
 
@@ -54,7 +84,6 @@
     <div id="tela-cadastro" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000;">
         <div style="background:white; width:90%; margin:5% auto; padding:20px; border-radius:10px; max-height: 85vh; overflow-y: auto;">
             <h2 id="titulo-arquivo" style="text-align:center; color:#00664d; margin-bottom: 10px;">GERENCIAR ARQUIVOS</h2>
-            
             <div style="background: #f0f7f5; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
                 <input type="text" id="cad-pasta-nome" placeholder="Nome da Pasta (ex: DIALOGO 1)" style="width:94%; margin-bottom:8px; padding:8px;">
                 <div style="display: flex; gap: 5px; width: 98%;">
@@ -65,13 +94,11 @@
                 <input type="text" id="cad-romanizacao" placeholder="Romanização" style="width:94%; margin-bottom:8px; padding:8px;">
                 <button id="btn-salvar-exercicio" onclick="salvarExercicioDinâmico()" style="width:100%; background:#28a745; color:white; padding:10px; border:none; border-radius:5px; font-weight:bold;">SALVAR EXERCÍCIO</button>
             </div>
-
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <button onclick="exportarDados()" class="btn-backup" style="background: #eefaf6; color: #00664d;">📤 EXPORTAR</button>
                 <button onclick="document.getElementById('input-importar').click()" class="btn-backup" style="background: #fff8e1; color: #856404;">📥 IMPORTAR</button>
                 <input type="file" id="input-importar" style="display:none" onchange="importarDados(this)">
             </div>
-
             <hr>
             <div id="visualizacao-arquivos" style="margin-top:10px;"></div>
             <button onclick="fecharCadastro()" style="width:100%; background:#ccc; padding:10px; border:none; border-radius:5px; margin-top:10px;">VOLTAR</button>
