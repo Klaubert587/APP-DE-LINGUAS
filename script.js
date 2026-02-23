@@ -268,7 +268,44 @@ function resetarFormulario() { indexEditando = null; pastaEditando = null; docum
 function abrirArquivos() { document.getElementById('tela-cadastro').style.display = 'block'; renderizarListaExercicios(); }
 function fecharCadastro() { document.getElementById('tela-cadastro').style.display = 'none'; }
 function trocarModo(m) { modoEstudo = m; document.getElementById('btn-modo-pergunta').classList.toggle('modo-ativo', m === 'pergunta'); document.getElementById('btn-modo-resposta').classList.toggle('modo-ativo', m === 'resposta'); }
-function reconhecerVoz() { const Rec = window.SpeechRecognition || window.webkitSpeechRecognition; if(!Rec) return alert("Navegador não suporta voz"); const r = new Rec(); r.lang = 'ko-KR'; r.start(); r.onresult = (e) => { if (e.results[0][0].transcript === respostaCoreanaCorreta) alert("🎯 PERFEITO!"); }; }
+
+
+function reconhecerVoz() {
+    const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Rec) return alert("Navegador não suporta voz");
+    
+    const r = new Rec();
+    r.lang = 'ko-KR';
+    r.interimResults = false;
+
+    document.getElementById('btn-falar').innerText = "OUVINDO...";
+    document.getElementById('btn-falar').style.background = "#ff4d4d";
+
+    r.start();
+
+    r.onresult = (e) => {
+        const falaUsuario = e.results[0][0].transcript;
+        const fraseCorreta = respostaCoreanaCorreta;
+        const score = calcularSimilaridade(falaUsuario, fraseCorreta);
+        const porcentagem = Math.round(score * 100);
+
+        let feedback = "";
+        if (porcentagem >= 85) feedback = `🌟 EXCELENTE! (${porcentagem}%)`;
+        else if (porcentagem >= 75) feedback = `✨ ÓTIMO! (${porcentagem}%)`;
+        else if (porcentagem >= 60) feedback = `👍 BOM! (${porcentagem}%)`;
+        else feedback = `❌ TENTE NOVAMENTE (${porcentagem}%)`;
+
+        alert(`${feedback}\n\nVocê disse: "${falaUsuario}"\nO correto é: "${fraseCorreta}"`);
+        document.getElementById('escrita-coreano').value = falaUsuario;
+    };
+
+    r.onend = () => {
+        document.getElementById('btn-falar').innerText = "FALAR";
+        document.getElementById('btn-falar').style.background = "#007bff";
+    };
+}
+
+// A PARTIR DAQUI CONTINUA O SEU CÓDIGO ORIGINAL (resetarSequencia, etc...)
 function resetarSequencia() { seqAtual = 0; }
 function excluirExercicio(p, i) { bancoDeDados[p].splice(i, 1); atualizarArmazenamento(); renderizarListaExercicios(); }
 function excluirPastaCompleta(p) { delete bancoDeDados[p]; atualizarArmazenamento(); renderizarListaExercicios(); atualizarMenuPastas(); }
@@ -291,3 +328,32 @@ function renderizarListaGramatica() {
     });
 }
 function excluirGramatica(t) { delete gramaticaSalva[t]; atualizarArmazenamento(); renderizarListaGramatica(); }
+
+function calcularSimilaridade(s1, s2) {
+    let longa = s1.length < s2.length ? s2 : s1;
+    let curta = s1.length < s2.length ? s1 : s2;
+    let tamLonga = longa.length;
+    if (tamLonga === 0) return 1.0;
+
+    const editDistance = (s1, s2) => {
+        let costs = [];
+        for (let i = 0; i <= s1.length; i++) {
+            let lastValue = i;
+            for (let j = 0; j <= s2.length; j++) {
+                if (i === 0) costs[j] = j;
+                else if (j > 0) {
+                    let newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                }
+            }
+            if (i > 0) costs[s2.length] = lastValue;
+        }
+        return costs[s2.length];
+    };
+
+    return (tamLonga - editDistance(longa, curta)) / tamLonga;
+} //
+
