@@ -30,26 +30,18 @@ function carregarTudo() {
     const exerciciosSalvos = localStorage.getItem('meuAppCoreano');
     const gramaticaSalvaDB = localStorage.getItem('minhaGramaticaPastas');
     
-    if (!exerciciosSalvos || Object.keys(JSON.parse(exerciciosSalvos)).length < 5) {
+    // Agora ele só restaura o padrão se o banco estiver COMPLETAMENTE vazio
+    if (!exerciciosSalvos) {
         bancoDeDados = {
             "01-TRABALHO ESSENCIAL": [
-                { coreano: "안녕하세요", traducao: "Bom dia / Olá", romanizacao: "Annyeong-haseyo", ordem: 0 },
-                { coreano: "감사합니다", traducao: "Obrigado", romanizacao: "Gam-sa-ham-ni-da", ordem: 0 },
-                { coreano: "수고하세요", traducao: "Bom trabalho", romanizacao: "Sugo-haseyo", ordem: 0 },
-                { coreano: "네", traducao: "Sim", romanizacao: "Ne", ordem: 0 },
-                { coreano: "아니요", traducao: "Não", romanizacao: "A-ni-yo", ordem: 0 }
-            ],
-            // ... (Seu banco de dados original continua aqui igual)
-            "02-ESCRITÓRIO": [{ coreano: "컴퓨터", traducao: "Computador", romanizacao: "Keom-pyu-teo", ordem: 0 }],
-            "DIALOGO 01-CHEGADA": [
-                { coreano: "안녕하세요", traducao: "Bom dia", romanizacao: "Annyeong", ordem: 1 },
-                { coreano: "네, 안녕하세요. 잘 잤어요?", traducao: "Sim, bom dia. Dormiu bem?", romanizacao: "Jal jass-eo-yo?", ordem: 2 }
+                { coreano: "안녕하세요", traducao: "Bom dia / Olá", romanizacao: "Annyeong-haseyo", ordem: 0 }
             ]
         };
         atualizarArmazenamento();
     } else {
         bancoDeDados = JSON.parse(exerciciosSalvos);
     }
+
     if (gramaticaSalvaDB) gramaticaSalva = JSON.parse(gramaticaSalvaDB);
     atualizarMenuPastas();
 }
@@ -253,13 +245,39 @@ function exportarDados() {
 }
 
 function importarDados(input) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const data = JSON.parse(e.target.result);
-        bancoDeDados = data.exercicios; gramaticaSalva = data.gramatica;
-        atualizarArmazenamento(); carregarTudo(); renderizarListaExercicios();
+    const arquivo = input.files[0];
+    if (!arquivo) return;
+
+    const leitor = new FileReader();
+    leitor.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+
+            if (data && data.exercicios) {
+                // Soma os novos dados aos atuais
+                bancoDeDados = Object.assign({}, bancoDeDados, data.exercicios);
+                
+                if (data.gramatica) {
+                    gramaticaSalva = data.gramatica;
+                }
+
+                atualizarArmazenamento();
+                
+                // ATENÇÃO: Aqui usamos o nome correto da sua função de desenho
+                renderizarListaExercicios(); 
+                
+                // Atualiza também o menu de seleção (o dropdown)
+                atualizarMenuPastas();
+                
+                alert("Novos exercícios adicionados com sucesso!");
+            } else {
+                alert("Este arquivo não parece ter exercícios válidos.");
+            }
+        } catch (err) {
+            alert("Erro ao ler o arquivo. Certifique-se de que é um .json válido.");
+        }
     };
-    reader.readAsText(input.files[0]);
+    leitor.readAsText(arquivo);
 }
 
 function atualizarMenuPastas() { const s = document.getElementById('pasta-treino'); s.innerHTML = ""; Object.keys(bancoDeDados).forEach(p => { let o = document.createElement('option'); o.value = p; o.innerText = "ESTUDAR: " + p; s.appendChild(o); }); }
@@ -356,4 +374,3 @@ function calcularSimilaridade(s1, s2) {
 
     return (tamLonga - editDistance(longa, curta)) / tamLonga;
 } //
-
