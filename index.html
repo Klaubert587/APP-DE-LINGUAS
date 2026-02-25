@@ -160,6 +160,48 @@
 
         </div>
 
-    
+<div id="tela-dialogo-simulado" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#00664d; z-index:3000; overflow-y: auto;">
+    <div class="container" style="background: none; box-shadow: none;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button onclick="voltarParaTreino()" style="background: white; color: #00664d; border: 2px solid #b1c7c2; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">VOLTAR</button>
+        </div>
+        <div class="display-box" style="background: white; border: 2px solid #000; padding: 20px; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+            <div id="pergunta-app-simulado" style="font-size: 1.8em; font-weight: bold; text-align: center; color: #333;">Aguardando...</div>
+            <div style="position: absolute; bottom: -25px; width: 100%; display: flex; justify-content: space-between; padding: 0 5px;">
+                <span onclick="revelarDicaSimulada('traducao')" style="font-size: 10px; color: #b1c7c2; cursor: pointer;">TRADUÇÃO</span>
+                <span onclick="revelarDicaSimulada('resposta')" style="font-size: 10px; color: #b1c7c2; cursor: pointer;">RESPOSTA</span>
+            </div>
+        </div>
+        <div id="area-dica-simulada" style="text-align: center; min-height: 40px; margin: 35px 0; color: #fff; font-weight: bold; font-style: italic;"></div>
+        <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 30px;">
+            <button onclick="ouvirPerguntaSimulada('normal')" style="background: white; color: #00664d; border: 2px solid #000; padding: 10px; font-weight: bold;">OUVIR</button>
+            <button onclick="ouvirPerguntaSimulada('lento')" style="background: white; color: #00664d; border: 1px solid #000; padding: 5px; font-size: 10px;">OUVIR LENTO</button>
+            <button id="btn-falar-simulado" onclick="reconhecerVozSimulada()" style="background: white; color: #00664d; border: 2px solid #000; padding: 10px; font-weight: bold;">FALAR</button>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <div onclick="proximoPassoSimulado()" style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid #b1c7c2; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #00664d;">
+                <span style="color: #b1c7c2; font-size: 30px;">◯</span>
+            </div>
+            <button onclick="abrirAssociacao()" style="background: white; color: #00664d; font-weight: bold; padding: 8px 15px; border-radius: 8px; border: none; cursor: pointer;">PRÓXIMA PÁGINA</button>
+        </div>
+    </div>
+</div>
+
+<div id="tela-associacao" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#00664d; z-index:4000; overflow-y: auto;">
+    <div class="container" style="background: none; box-shadow: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <button onclick="fecharAssociacao()" style="background: white; color: #00664d; border: 2px solid #b1c7c2; padding: 5px 15px; border-radius: 5px; font-weight: bold;">VOLTAR</button>
+            <select id="pasta-associacao" onchange="iniciarAssociacao()" style="padding: 5px; border-radius: 5px;"></select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+            <div id="coluna-perguntas" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            <div id="coluna-respostas" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+        <div style="text-align: center;">
+            <button onclick="iniciarAssociacao()" style="background: white; color: #00664d; font-weight: bold; padding: 10px 20px; border-radius: 8px; border: none;">TROCAR EXERCÍCIO</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
