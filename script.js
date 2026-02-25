@@ -512,3 +512,210 @@ function proximoExercicioDialogo() {
     seqAtual++;
     gerarNovoExercicioTreino();
 }
+
+// VARIÁVEIS DE CONTROLE DA NOVA PÁGINA
+let dialogoAtualSimulado = null;
+
+function irParaProximaPaginaTreino() {
+    const pasta = document.getElementById('pasta-treino').value;
+    if (!bancoDeDados[pasta] || bancoDeDados[pasta].length < 2) {
+        return alert("Esta pasta precisa de pelo menos 2 frases para um diálogo!");
+    }
+    document.getElementById('tela-dialogo-simulado').style.display = 'block';
+    seqAtual = 0; // Começa do início do diálogo
+    carregarPerguntaSimulada();
+}
+
+function voltarParaTreino() {
+    document.getElementById('tela-dialogo-simulado').style.display = 'none';
+    window.speechSynthesis.cancel();
+}
+
+function carregarPerguntaSimulada() {
+    const pasta = document.getElementById('pasta-treino').value;
+    const lista = bancoDeDados[pasta];
+    
+    // O APP sempre pega o índice atual (Ex: #1, #3, #5...)
+    dialogoAtualSimulado = lista[seqAtual];
+    
+    if (dialogoAtualSimulado) {
+        document.getElementById('pergunta-app-simulado').innerText = dialogoAtualSimulado.coreano;
+        document.getElementById('area-dica-simulada').innerText = ""; // Limpa dicas anteriores
+    } else {
+        alert("Fim do diálogo!");
+        seqAtual = 0;
+        carregarPerguntaSimulada();
+    }
+}
+
+function revelarDicaSimulada(tipo) {
+    const pasta = document.getElementById('pasta-treino').value;
+    const lista = bancoDeDados[pasta];
+    const areaDica = document.getElementById('area-dica-simulada');
+    
+    if (tipo === 'traducao') {
+        // Apenas mostra o texto da tradução da pergunta atual
+        areaDica.innerText = dialogoAtualSimulado.traducao;
+    } 
+    else if (tipo === 'resposta') {
+        // Localiza o próximo item (a resposta que o usuário deve dar)
+        const respostaEsperada = lista[seqAtual + 1];
+        
+        if (respostaEsperada) {
+            // 1. Mostra o texto na tela
+            areaDica.innerText = "Dica: " + respostaEsperada.coreano;
+            
+            // 2. Executa o áudio em velocidade moderada (0.8)
+            window.speechSynthesis.cancel(); // Para qualquer áudio em execução
+            const msg = new SpeechSynthesisUtterance(respostaEsperada.coreano);
+            msg.lang = 'ko-KR';
+            msg.rate = 0.8; // Velocidade moderada para facilitar a memorização
+            window.speechSynthesis.speak(msg);
+        } else {
+            areaDica.innerText = "Fim do diálogo.";
+        }
+    }
+}
+
+function ouvirPerguntaSimulada(modo) {
+    if (!dialogoAtualSimulado) return;
+    window.speechSynthesis.cancel();
+    const msg = new SpeechSynthesisUtterance(dialogoAtualSimulado.coreano);
+    msg.lang = 'ko-KR';
+    msg.rate = (modo === 'lento') ? 0.6 : 1.0;
+    window.speechSynthesis.speak(msg);
+}
+
+function proximoPassoSimulado() {
+    // Pula de 2 em 2 (O app pula a sua resposta e vai para a próxima pergunta dele)
+    seqAtual += 2;
+    carregarPerguntaSimulada();
+}
+
+function reconhecerVozSimulada() {
+    const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Rec) return alert("Navegador não suporta voz");
+    
+    const pasta = document.getElementById('pasta-treino').value;
+    const respostaEsperada = bancoDeDados[pasta][seqAtual + 1];
+
+    if (!respostaEsperada) return alert("Não há resposta para comparar.");
+
+    const r = new Rec();
+    r.lang = 'ko-KR';
+    const btn = document.getElementById('btn-falar-simulado');
+    btn.style.background = "#ffdce0";
+
+    r.start();
+    r.onresult = (e) => {
+        const falaUsuario = e.results[0][0].transcript;
+        const score = calcularSimilaridade(falaUsuario, respostaEsperada.coreano);
+        const porcentagem = Math.round(score * 100);
+
+        if (porcentagem >= 70) {
+            alert(`✅ Muito bem! (${porcentagem}%)\nVocê disse: ${falaUsuario}`);
+        } else {
+            alert(`❌ Tente de novo (${porcentagem}%)\nVocê disse: ${falaUsuario}\nEsperado: ${respostaEsperada.coreano}`);
+        }
+    };
+    r.onend = () => { btn.style.background = "white"; };
+}
+
+let selecionadoPergunta = null;
+let selecionadoResposta = null;
+
+function abrirAssociacao() {
+    document.getElementById('tela-associacao').style.display = 'block';
+    // Sincroniza o select da nova tela com as pastas existentes
+    const s = document.getElementById('pasta-associacao');
+    s.innerHTML = document.getElementById('pasta-treino').innerHTML;
+    s.value = document.getElementById('pasta-treino').value;
+    iniciarAssociacao();
+}
+
+function fecharAssociacao() {
+    document.getElementById('tela-associacao').style.display = 'none';
+}
+
+function iniciarAssociacao() {
+    const pasta = document.getElementById('pasta-associacao').value;
+    const lista = [...bancoDeDados[pasta]];
+    if (lista.length < 2) return alert("Adicione mais itens para jogar!");
+
+    const colP = document.getElementById('coluna-perguntas');
+    const colR = document.getElementById('coluna-respostas');
+    colP.innerHTML = ""; colR.innerHTML = "";
+    selecionadoPergunta = null; selecionadoResposta = null;
+
+    // Embaralha para as colunas ficarem diferentes
+    const perguntas = lista.filter((_, i) => i % 2 === 0).sort(() => Math.random() - 0.5);
+    const respostas = lista.filter((_, i) => i % 2 !== 0).sort(() => Math.random() - 0.5);
+
+    perguntas.forEach(item => criarCardAssociacao(item, colP, 'pergunta'));
+    respostas.forEach(item => criarCardAssociacao(item, colR, 'resposta'));
+}
+
+function criarCardAssociacao(item, container, tipo) {
+    const div = document.createElement('div');
+    div.innerText = item.coreano;
+    div.className = "card-jogo";
+    div.style = "background: white; padding: 15px 10px; border-radius: 8px; text-align: center; font-weight: bold; cursor: pointer; font-size: 0.9em; border: 2px solid transparent; min-height: 50px; display: flex; align-items: center; justify-content: center;";
+    
+    div.onclick = () => {
+        falarPalavra(item.coreano, 'COREANO'); // Reutiliza sua função de voz
+        
+        if (tipo === 'pergunta') {
+            if (selecionadoPergunta) selecionadoPergunta.style.borderColor = "transparent";
+            selecionadoPergunta = { div, item };
+            div.style.borderColor = "#00664d";
+        } else {
+            if (selecionadoResposta) selecionadoResposta.style.borderColor = "transparent";
+            selecionadoResposta = { div, item };
+            div.style.borderColor = "#00664d";
+        }
+        verificarPar();
+    };
+    container.appendChild(div);
+}
+
+function verificarPar() {
+    if (!selecionadoPergunta || !selecionadoResposta) return;
+
+    // A lógica assume que a resposta correta é o item imediatamente após a pergunta no banco
+    const pasta = document.getElementById('pasta-associacao').value;
+    const lista = bancoDeDados[pasta];
+    const idxPergunta = lista.findIndex(x => x.coreano === selecionadoPergunta.item.coreano);
+    
+    if (lista[idxPergunta + 1] && lista[idxPergunta + 1].coreano === selecionadoResposta.item.coreano) {
+        // ACERTO: Desaparecem
+        setTimeout(() => {
+            selecionadoPergunta.div.style.visibility = "hidden";
+            selecionadoResposta.div.style.visibility = "hidden";
+            selecionadoPergunta = null; selecionadoResposta = null;
+            if (checarFimJogo()) alert("Parabéns! Você completou o diálogo!");
+        }, 300);
+    } else {
+        // ERRO: Pisca vermelho
+        const pDiv = selecionadoPergunta.div;
+        const rDiv = selecionadoResposta.div;
+        pDiv.style.backgroundColor = rDiv.style.backgroundColor = "#ffdce0";
+        
+        // Animação de piscar
+        let piscadas = 0;
+        const intervalo = setInterval(() => {
+            pDiv.style.opacity = rDiv.style.opacity = (piscadas % 2 === 0) ? "0.3" : "1";
+            piscadas++;
+            if (piscadas > 4) {
+                clearInterval(intervalo);
+                pDiv.style.backgroundColor = rDiv.style.backgroundColor = "white";
+                pDiv.style.borderColor = rDiv.style.borderColor = "transparent";
+                selecionadoPergunta = null; selecionadoResposta = null;
+            }
+        }, 150);
+    }
+}
+
+function checarFimJogo() {
+    return Array.from(document.querySelectorAll('.card-jogo')).every(c => c.style.visibility === "hidden");
+}
+
