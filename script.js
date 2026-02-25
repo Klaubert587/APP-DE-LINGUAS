@@ -374,3 +374,118 @@ function calcularSimilaridade(s1, s2) {
 
     return (tamLonga - editDistance(longa, curta)) / tamLonga;
 } //
+
+// --- LÓGICA DE TREINO DEFINITIVA (COM DICA E VOZ 0.3) ---
+let treinoItemCorreto = null;
+
+function abrirModoTreino() {
+    const pasta = document.getElementById('pasta-treino').value;
+    if (!bancoDeDados[pasta] || bancoDeDados[pasta].length < 1) {
+        return alert("Selecione uma pasta com exercícios primeiro!");
+    }
+    document.getElementById('tela-treino-escolha').style.display = 'block';
+    gerarNovoExercicioTreino();
+}
+
+function fecharModoTreino() {
+    document.getElementById('tela-treino-escolha').style.display = 'none';
+    window.speechSynthesis.cancel(); 
+}
+
+function gerarNovoExercicioTreino() {
+    const pasta = document.getElementById('pasta-treino').value;
+    const lista = bancoDeDados[pasta];
+    
+    if (!lista || lista.length === 0) return;
+
+    treinoItemCorreto = lista[Math.floor(Math.random() * lista.length)];
+    
+    let opcoes = [treinoItemCorreto];
+    let todasAsFrases = Object.values(bancoDeDados).flat();
+    while(opcoes.length < 4 && todasAsFrases.length >= 4) {
+        let sorteio = todasAsFrases[Math.floor(Math.random() * todasAsFrases.length)];
+        if (!opcoes.find(o => o.coreano === sorteio.coreano)) {
+            opcoes.push(sorteio);
+        }
+    }
+    opcoes.sort(() => Math.random() - 0.5);
+
+    // Atualiza Textos
+    document.getElementById('pergunta-treino-pt').innerText = treinoItemCorreto.traducao;
+    
+    // Mostra a "cola" em coreano clarinho
+    const dica = document.getElementById('dica-coreano-treino');
+    if(dica) {
+        dica.innerText = treinoItemCorreto.coreano;
+    }
+
+    const input = document.getElementById('input-treino-coreano');
+    input.value = ""; 
+    input.style.backgroundColor = "white";
+    input.placeholder = "Escolha o quadrado e ESCREVA...";
+    
+    const displayTraducao = document.getElementById('traducao-resultado-treino');
+    if(displayTraducao) displayTraducao.innerText = "";
+
+    const grid = document.getElementById('grid-opcoes-coreano');
+    grid.innerHTML = "";
+    opcoes.forEach(opt => {
+        const btn = document.createElement('div');
+        btn.style = "background: white; color: #014736; padding: 15px 5px; border-radius: 8px; text-align: center; font-weight: bold; cursor: pointer; font-size: 1.0em; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;";
+        btn.innerText = opt.coreano;
+        btn.onclick = () => {
+            window.speechSynthesis.cancel();
+            falarPalavra(opt.coreano, 'COREANO'); 
+            validarEscolhaTreino(opt.coreano);
+        };
+        grid.appendChild(btn);
+    });
+}
+
+function validarEscolhaTreino(escolha) {
+    const input = document.getElementById('input-treino-coreano');
+    const limpar = (t) => t.replace(/[\s\.\?\!\,\~]/g, '');
+    if (limpar(escolha) === limpar(treinoItemCorreto.coreano)) {
+        input.style.backgroundColor = "#d1f7ec"; 
+        input.focus();
+    } else {
+        alert("❌ Incorreto!");
+    }
+}
+
+function verificarEscritaTreino() {
+    const input = document.getElementById('input-treino-coreano');
+    const displayTraducao = document.getElementById('traducao-resultado-treino');
+    const limpar = (t) => t.replace(/[\s\.\?\!\,\~]/g, '');
+    if (limpar(input.value) === limpar(treinoItemCorreto.coreano)) {
+        input.style.backgroundColor = "#d1f7ec";
+        if(displayTraducao) displayTraducao.innerText = "Tradução: " + treinoItemCorreto.traducao;
+    } else {
+        if(displayTraducao) displayTraducao.innerText = "";
+    }
+}
+
+function ouvirLento() {
+    if (!treinoItemCorreto) return;
+    window.speechSynthesis.cancel(); 
+    const msg = new SpeechSynthesisUtterance(treinoItemCorreto.coreano);
+    msg.lang = 'ko-KR';
+    msg.rate = 0.7; // Velocidade bem lenta
+    window.speechSynthesis.speak(msg);
+}
+
+function reconhecerVozTreino() {
+    const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Rec) return alert("Navegador não suporta voz");
+    const r = new Rec();
+    r.lang = 'ko-KR';
+    const btn = document.getElementById('btn-falar-treino');
+    btn.innerText = "OUVINDO...";
+    r.start();
+    r.onresult = (e) => {
+        const fala = e.results[0][0].transcript;
+        document.getElementById('input-treino-coreano').value = fala;
+        verificarEscritaTreino();
+    };
+    r.onend = () => { btn.innerText = "FALAR"; };
+}
