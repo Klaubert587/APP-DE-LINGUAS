@@ -398,7 +398,13 @@ function gerarNovoExercicioTreino() {
     
     if (!lista || lista.length === 0) return;
 
-    treinoItemCorreto = lista[Math.floor(Math.random() * lista.length)];
+    treinoItemCorreto = lista[seqAtual + 1];
+    const perguntaAtual = lista[seqAtual];
+
+    if (!perguntaAtual || !treinoItemCorreto) {
+    seqAtual = 0;
+    return gerarNovoExercicioTreino();
+}
     
     let opcoes = [treinoItemCorreto];
     let todasAsFrases = Object.values(bancoDeDados).flat();
@@ -411,12 +417,12 @@ function gerarNovoExercicioTreino() {
     opcoes.sort(() => Math.random() - 0.5);
 
     // Atualiza Textos
-    document.getElementById('pergunta-treino-pt').innerText = treinoItemCorreto.traducao;
+    document.getElementById('pergunta-treino-pt').innerText = perguntaAtual.traducao;
     
     // Mostra a "cola" em coreano clarinho
     const dica = document.getElementById('dica-coreano-treino');
-    if(dica) {
-        dica.innerText = treinoItemCorreto.coreano;
+    if (dica) {
+        dica.innerText = perguntaAtual.coreano;
     }
 
     const input = document.getElementById('input-treino-coreano');
@@ -433,23 +439,35 @@ function gerarNovoExercicioTreino() {
         const btn = document.createElement('div');
         btn.style = "background: white; color: #014736; padding: 15px 5px; border-radius: 8px; text-align: center; font-weight: bold; cursor: pointer; font-size: 1.0em; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;";
         btn.innerText = opt.coreano;
-        btn.onclick = () => {
+        btn.onclick = (event) => {
             window.speechSynthesis.cancel();
             falarPalavra(opt.coreano, 'COREANO'); 
-            validarEscolhaTreino(opt.coreano);
+            validarEscolhaTreino(opt.coreano, event);
         };
         grid.appendChild(btn);
     });
 }
 
-function validarEscolhaTreino(escolha) {
+function validarEscolhaTreino(escolha, event) {
     const input = document.getElementById('input-treino-coreano');
     const limpar = (t) => t.replace(/[\s\.\?\!\,\~]/g, '');
+
     if (limpar(escolha) === limpar(treinoItemCorreto.coreano)) {
-        input.style.backgroundColor = "#d1f7ec"; 
+        input.style.backgroundColor = "#d1f7ec";
         input.focus();
     } else {
-        alert("❌ Incorreto!");
+
+        // Remove erro antigo se já existir
+        const antigo = event.currentTarget.querySelector('.erro-x');
+        if (antigo) antigo.remove();
+
+        // Cria o X vermelho
+        const erro = document.createElement("div");
+        erro.innerText = "✖";
+        erro.className = "erro-x";
+        erro.style = "color:red; font-size:14px; margin-top:5px;";
+
+        event.currentTarget.appendChild(erro);
     }
 }
 
@@ -488,4 +506,9 @@ function reconhecerVozTreino() {
         verificarEscritaTreino();
     };
     r.onend = () => { btn.innerText = "FALAR"; };
+}
+
+function proximoExercicioDialogo() {
+    seqAtual++;
+    gerarNovoExercicioTreino();
 }
