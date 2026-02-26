@@ -119,8 +119,8 @@
 
     <script src="script.js"></script>
     
-<div id="tela-treino-escolha" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#00664d; z-index:2000; overflow-y: auto;">
-    <div class="container" style="background: none; box-shadow: none;">
+<div id="tela-treino-escolha" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; padding-top:50px; background:#00664d; z-index:2000; overflow-y: auto;">
+    <div class="container" style="background: none; box-shadow: none; padding-bottom:120px;">
         <button onclick="fecharModoTreino()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 15px; border-radius: 5px; margin-bottom: 20px; cursor: pointer; font-weight: bold;">VOLTAR</button>
 
         <div class="display-box" style="min-height: 45px; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px;">
@@ -160,7 +160,7 @@
 
         </div>
 
-<div id="tela-dialogo-simulado" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#00664d; z-index:3000; overflow-y: auto;">
+<div id="tela-dialogo-simulado" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; padding-top:35px; background:#00664d; z-index:3000; overflow-y: auto;">
     <div class="container" style="background: none; box-shadow: none;">
         <div style="text-align: center; margin-bottom: 20px;">
             <button onclick="voltarParaTreino()" style="background: white; color: #00664d; border: 2px solid #b1c7c2; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">VOLTAR</button>
@@ -187,8 +187,8 @@
     </div>
 </div>
 
-<div id="tela-associacao" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#00664d; z-index:4000; overflow-y: auto;">
-    <div class="container" style="background: none; box-shadow: none;">
+<div id="tela-associacao" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; padding-top:35px; background:#00664d; z-index:4000; overflow-y: auto;">
+    <div class="container" style="background: none; box-shadow: none; padding-top: 20px; padding-bottom: 30px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <button onclick="fecharAssociacao()" style="background: white; color: #00664d; border: 2px solid #b1c7c2; padding: 5px 15px; border-radius: 5px; font-weight: bold;">VOLTAR</button>
             <select id="pasta-associacao" onchange="iniciarAssociacao()" style="padding: 5px; border-radius: 5px;"></select>
@@ -197,10 +197,59 @@
             <div id="coluna-perguntas" style="display: flex; flex-direction: column; gap: 10px;"></div>
             <div id="coluna-respostas" style="display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
-        <div style="text-align: center;">
-            <button onclick="iniciarAssociacao()" style="background: white; color: #00664d; font-weight: bold; padding: 10px 20px; border-radius: 8px; border: none;">TROCAR EXERCÍCIO</button>
+        <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px;">
+    <button onclick="iniciarAssociacao()" style="background: white; color: #00664d; font-weight: bold; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;">
+        TROCAR EXERCÍCIO
+    </button>
+    
+    <button onclick="abrirMontarFrase()" style="background: white; color: #00664d; font-weight: bold; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;">
+        PRÓXIMA PÁGINA (MONTAR FRASE)
+</button>
+</div>
+
+</div>
+</div>
+
+<div id="tela-montar-frase" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#00664d; z-index:5000; overflow-y:auto;">
+    <div class="container" style="background:none; box-shadow:none; margin-top:20px;">
+
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <button onclick="voltarParaAssociacao()" 
+            style="background:white; color:#00664d; border:2px solid #b1c7c2; padding:5px 15px; border-radius:5px; font-weight:bold;">
+                VOLTAR
+            </button>
+
+            <select id="pasta-montar-frase" onchange="iniciarMontarFrase()" 
+            style="padding:5px; border-radius:5px;"></select>
         </div>
-    </div>
+
+        <div class="display-box" style="text-align:center; margin-bottom:20px;">
+            <div id="pergunta-montar-pt" style="font-weight:bold; font-size:1.4em;"></div>
+        </div>
+
+        <div id="area-palavras" 
+        style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px;"></div>
+
+        <div id="area-resposta" 
+        style="min-height:60px; background:white; border-radius:10px; padding:10px; margin-bottom:20px; text-align:center;">
+        </div>
+
+        <div style="display:flex; justify-content:center; gap:10px;">
+    <button onclick="verificarMontagem()" style="background:#28a745; color:white;">VERIFICAR</button>
+
+    <button onclick="voltarUltimaPalavra()" style="background:#ffc107; color:#000;">
+        VOLTAR PALAVRA
+    </button>
+
+    <button onclick="proximaMontagem()" style="background:white; color:#00664d;">
+        PRÓXIMA
+    </button>
+
+    <button id="btn-refazer-montagem"
+        onclick="refazerExercicioMontagem()"
+        style="display:none; background:#ff7043; color:white;">
+        REFAZER
+    </button>
 </div>
 
 </body>
