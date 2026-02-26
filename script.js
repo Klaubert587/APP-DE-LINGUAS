@@ -698,12 +698,11 @@ function verificarPar() {
         // ERRO: Pisca vermelho
         const pDiv = selecionadoPergunta.div;
         const rDiv = selecionadoResposta.div;
-        pDiv.style.backgroundColor = rDiv.style.backgroundColor = "#ffdce0";
         
         // Animação de piscar
         let piscadas = 0;
         const intervalo = setInterval(() => {
-            pDiv.style.opacity = rDiv.style.opacity = (piscadas % 2 === 0) ? "0.3" : "1";
+            pDiv.style.opacity = rDiv.style.opacity = (piscadas % 3 === 0) ? "1.0" : "1";
             piscadas++;
             if (piscadas > 4) {
                 clearInterval(intervalo);
@@ -717,5 +716,106 @@ function verificarPar() {
 
 function checarFimJogo() {
     return Array.from(document.querySelectorAll('.card-jogo')).every(c => c.style.visibility === "hidden");
+}
+
+let exercicioMontagemAtual = null;
+let palavrasEmbaralhadas = [];
+let respostaUsuario = [];
+
+function abrirMontarFrase() {
+    document.getElementById("tela-associacao").style.display = "none";
+    document.getElementById("tela-montar-frase").style.display = "block";
+
+    const select = document.getElementById("pasta-montar-frase");
+    select.innerHTML = document.getElementById("pasta-associacao").innerHTML;
+
+    iniciarMontarFrase();
+}
+
+function proximaMontagem() {
+    iniciarMontarFrase();
+}
+
+// BOTÃO VOLTAR DA PÁGINA 5
+function voltarParaAssociacao() {
+    document.getElementById("tela-montar-frase").style.display = "none";
+    document.getElementById("tela-associacao").style.display = "block";
+}
+
+function iniciarMontarFrase() {
+    const pasta = document.getElementById("pasta-montar-frase").value;
+    if (!bancoDeDados[pasta]) return;
+
+    const lista = bancoDeDados[pasta];
+    exercicioMontagemAtual = lista[Math.floor(Math.random() * lista.length)];
+
+    document.getElementById("pergunta-montar-pt").innerText = exercicioMontagemAtual.traducao;
+
+    palavrasEmbaralhadas = exercicioMontagemAtual.coreano.split(" ");
+    palavrasEmbaralhadas.sort(() => Math.random() - 0.5);
+
+    respostaUsuario = [];
+
+    renderizarPalavras();
+}
+
+function renderizarPalavras() {
+    const area = document.getElementById("area-palavras");
+    const resposta = document.getElementById("area-resposta");
+
+    area.innerHTML = "";
+    resposta.innerHTML = respostaUsuario.join(" ");
+
+    palavrasEmbaralhadas.forEach((palavra, index) => {
+        const btn = document.createElement("button");
+        btn.innerText = palavra;
+        btn.onclick = () => selecionarPalavra(index);
+        area.appendChild(btn);
+    });
+}
+
+function selecionarPalavra(index) {
+    respostaUsuario.push(palavrasEmbaralhadas[index]);
+    palavrasEmbaralhadas.splice(index, 1);
+    renderizarPalavras();
+}
+
+function voltarUltimaPalavra() {
+    if (respostaUsuario.length === 0) return;
+
+    const palavra = respostaUsuario.pop();
+    palavrasEmbaralhadas.push(palavra);
+
+    renderizarPalavras();
+}
+
+function verificarMontagem() {
+    const respostaCorreta = exercicioMontagemAtual.coreano.trim();
+    const resposta = respostaUsuario.join(" ").trim();
+
+    if (resposta === respostaCorreta) {
+        alert("Correto!");
+    } else {
+        alert("Ainda não está correto. Clique em REFazer exercício.");
+
+        const botao = document.getElementById("btn-refazer-montagem");
+        if (botao) botao.style.display = "block";
+    }
+}
+
+function refazerExercicioMontagem() {
+    respostaUsuario = [];
+    
+    palavrasEmbaralhadas = exercicioMontagemAtual.coreano.split(" ");
+    palavrasEmbaralhadas.sort(() => Math.random() - 0.5);
+
+    renderizarPalavras();
+
+    const botao = document.getElementById("btn-refazer-montagem");
+    if (botao) botao.style.display = "none";
+}
+
+function proximaMontagem() {
+    iniciarMontarFrase();
 }
 
