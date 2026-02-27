@@ -845,7 +845,7 @@ function alternarModoDitado() {
 function ouvirFraseLenta() {
     const displayTexto = document.getElementById('texto-pergunta');
     if (displayTexto && displayTexto.innerText.trim() !== "" && displayTexto.innerText !== "SELECIONE UMA PASTA E APERTE PLAY") {
-        falarTexto(displayTexto.innerText, 'ko-KR', 0.6);
+        falarTexto(displayTexto.innerText, 'ko-KR', 0.5);
     }
 }
 
@@ -926,3 +926,39 @@ function verificarRespostaSimulado() {
             "<span style='color: #ff4d4d; font-weight: bold;'>❌ TENTE NOVAMENTE</span>";
     }
 }
+
+function proximoPassoSimulado() {
+    // 1. Descobrir qual pasta está selecionada no treino
+    const nomePasta = document.getElementById('pasta-treino').value;
+    
+    if (!nomePasta || !bancoDeDados[nomePasta]) {
+        alert("Selecione uma pasta na tela inicial primeiro!");
+        return;
+    }
+
+    const exercicios = bancoDeDados[nomePasta];
+    
+    // 2. Aumentar o contador para a próxima frase
+    seqAtual++;
+
+    // 3. Se acabar as frases, volta para a primeira
+    if (seqAtual >= exercicios.length) {
+        seqAtual = 0;
+        alert("Fim do diálogo! Reiniciando...");
+    }
+
+    // 4. Pegar os dados da nova frase
+    const ex = exercicios[seqAtual];
+
+    // 5. Atualizar a tela do simulado
+    document.getElementById('pergunta-app-simulado').innerText = ex.coreano;
+    
+    // 6. Atualizar a "memória" para os botões TRADUÇÃO e VERIFICAR funcionarem
+    respostaCoreanaCorreta = ex.coreano;
+    respostaPortuguesCorreta = ex.portugues;
+
+    // 7. Limpar campos de texto e dicas anteriores
+    document.getElementById('area-dica-simulada').innerText = "";
+    const campoEscrita = document.getElementById('escrita-usuario-simulado');
+    if(campoEscrita) campoEscrita.value = "";
+}   
