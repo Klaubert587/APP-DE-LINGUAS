@@ -5,7 +5,8 @@ let respostaPortuguesCorreta = "";
 let modoEstudo = "pergunta";
 let indexEditando = null; 
 let pastaEditando = null;
-let seqAtual = 0; 
+let seqAtual = 0;
+let modoDitadoAtivo = false; 
 
 window.onload = function() { 
     carregarTudo(); 
@@ -818,4 +819,44 @@ function refazerExercicioMontagem() {
 function proximaMontagem() {
     iniciarMontarFrase();
 }
+
+function alternarModoDitado() {
+    // Pegamos o container onde o texto fica (o balão de cima)
+    const displayTexto = document.getElementById('texto-pergunta');
+    const labelDitado = document.getElementById('label-ditado');
+    
+    modoDitadoAtivo = !modoDitadoAtivo;
+
+    if (modoDitadoAtivo) {
+        // OPACITY 0 deixa o texto invisível para o olho humano,
+        // mas o seu código de áudio ainda consegue "ler" o conteúdo que está lá.
+        displayTexto.style.opacity = "0";
+        labelDitado.style.color = "#ff4d4d"; 
+        labelDitado.innerHTML = "<strong>DITADO: ON</strong>";
+    } else {
+        // Volta a opacidade para 1 (visível)
+        displayTexto.style.opacity = "1";
+        labelDitado.style.color = "#b1c7c2";
+        labelDitado.innerText = "DITADO";
+    }
+}
+
+// Função para o áudio lento
+function ouvirFraseLenta() {
+    const displayTexto = document.getElementById('texto-pergunta');
+    if (displayTexto && displayTexto.innerText.trim() !== "" && displayTexto.innerText !== "SELECIONE UMA PASTA E APERTE PLAY") {
+        falarTexto(displayTexto.innerText, 'ko-KR', 0.6);
+    }
+}
+
+// Função de voz ajustada para aceitar velocidade (rate)
+function falarTexto(texto, lingua, velocidade = 1) {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(texto);
+    utterance.lang = lingua;
+    utterance.rate = velocidade; // 0.5 é lento, 1 é normal
+    window.speechSynthesis.speak(utterance);
+}
+
 
