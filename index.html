@@ -48,7 +48,12 @@
 
         <div class="sub-labels" style="display: flex; justify-content: space-around; margin: 10px 0; align-items: center;">
             <button class="modo-btn modo-ativo" id="btn-modo-pergunta" onclick="trocarModo('pergunta')">PERGUNTA</button>
-            <span id="label-romanizacao" style="font-size: 10px; color: #b1c7c2; font-weight: bold; cursor: pointer; border-bottom: 1px dashed #00664d;">ROMANIZAÇÃO</span>
+            
+            <div style="display: flex; gap: 10px;">
+                <span id="label-romanizacao" style="font-size: 10px; color: #b1c7c2; font-weight: bold; cursor: pointer; border-bottom: 1px dashed #00664d;">ROMANIZAÇÃO</span>
+                <span id="label-ditado" onclick="alternarModoDitado()" style="font-size: 10px; color: #b1c7c2; font-weight: bold; cursor: pointer; border-bottom: 1px dashed #00664d;">DITADO</span>
+            </div>
+
             <button class="modo-btn" id="btn-modo-resposta" onclick="trocarModo('resposta')">RESPOSTA</button>
         </div>
 
@@ -66,14 +71,20 @@
             </div>
         </div>
 
-        <div class="botoes-audio" style="margin-top: 20px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-            <button onclick="ouvirPergunta()" style="padding: 8px 12px;">OUVIR</button>
+        <div class="botoes-audio" style="margin-top: 20px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                <button onclick="ouvirPergunta()" style="padding: 8px 12px;">OUVIR</button>
+                <span onclick="ouvirFraseLenta()" style="font-size: 9px; color: #b1c7c2; font-weight: bold; cursor: pointer; text-decoration: underline; text-transform: uppercase;">Lento</span>
+            </div>
+
             <button onclick="verificarResposta()" style="background: #28a745; color: white; padding: 8px 12px;">VERIFICAR</button>
             <button id="btn-falar" onclick="reconhecerVoz()" style="background: #007bff; color: white; padding: 8px 12px;">FALAR</button>
             <button onclick="abrirModoTreino()" style="background: #b1c7c2; color: #00664d; font-weight: bold; border: 1px solid #00664d; padding: 8px 12px;">TREINO</button>
         </div>
+
         <div class="footer" style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 30px;">
             <select id="pasta-treino" onchange="resetarSequencia()" style="padding: 5px; border-radius: 5px; border: 1px solid #00664d; font-size: 10px; font-weight: bold;"></select>
+
             <div style="display: flex; justify-content: space-around; width: 100%; align-items: center;">
                 <button onclick="abrirArquivos()">ARQUIVO</button>
                 <div class="btn-central" id="play-btn"></div> 
