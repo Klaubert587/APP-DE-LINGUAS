@@ -1,267 +1,1003 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu App de Coreano Dinâmico</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        
-        .modo-btn { cursor: pointer; padding: 2px 8px; border-radius: 4px; border: none; background: none; font-size: 10px; font-weight: bold; color: #666; }
-        .modo-ativo { background: #00664d; color: white !important; }
-        .item-lista { background: #f9f9f9; border: 1px solid #eee; padding: 8px; margin-bottom: 5px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-        .btn-excluir { background: #ff4d4d; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; margin-left: 5px; }
-        .btn-editar { background: #ffc107; color: #000; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 10px; }
-        .btn-backup { flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #00664d; font-size: 10px; font-weight: bold; cursor: pointer; }
-        /* Estilo para as palavras clicáveis */
-        .palavra-clicavel { cursor: pointer; display: inline-block; padding: 2px; }
-        .palavra-clicavel:active { background-color: #e0e0e0; border-radius: 3px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <style>
-        .modo-btn { 
-            cursor: pointer; 
-            padding: 2px 8px; 
-            border-radius: 4px; 
-            border: none; 
-            background: none; 
-            font-size: 10px; 
-            font-weight: bold; 
-            color: rgba(255, 255, 255, 0.7) !important; /* Deixa o texto claro */
-        }
-        .modo-ativo { 
-            background: #00664d; 
-            color: white !important; 
-            border: 1px solid white; /* Destaque ao ativo */
-        }
-        /* ... mantenha os outros estilos abaixo (item-lista, btn-excluir, etc) ... */
-    </style>
+<title>L-PRO Industrial</title>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+
+:root{
+--bg-main:#2a2a2a;
+--panel-bg:#2a2a2a;
+--accent:#00ff9d;
+--accent-glow:rgba(0,255,157,0.4);
+--shd-out:8px 8px 16px #1b1b1b,-6px -6px 14px #393939;
+--shd-in:inset 3px 3px 7px #1b1b1b,inset -3px -3px 7px #393939;
+}
+
+body{
+background:var(--bg-main);
+color:#ccc;
+font-family:'Segoe UI',sans-serif;
+margin:0;
+display:flex;
+flex-direction:column;
+align-items:center;
+height:100vh;
+overflow:hidden;
+}
+
+/* visor */
+
+.machine-display{
+width:88%;
+max-width:360px;
+height:260px;
+background:var(--panel-bg);
+margin-top:40px;
+border-radius:40px;
+box-shadow:var(--shd-out);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+padding:25px;
+}
+
+/* TAMANHO E COR TEXTO EM COREANO */
+
+#coreano-txt{
+font-size:28px;
+color: #dbd4d3;
+text-shadow:0 0 15px var(--accent-glow);
+font-weight:bold;
+}
+
+/* COR TEXTO TRADUÇÃO */
+
+#traducao-txt{
+font-size:13px;
+color:#cccccc;
+margin-bottom:20px;
+}
+
+/* COR TEXTO BALÃO */
+
+select{
+background:var(--bg-main);
+border:none;
+color: #f1f8d0;
+padding:12px;
+border-radius:17px;
+text-shadow: 0 0 15px #a3a3a3; 
+width:90%;
+outline:none;
+}
+
+/* botões */
+
+.bottom-nav{
+position:fixed;
+bottom:30px;
+width:92%;
+max-width:420px;
+display:flex;
+justify-content:space-around;
+align-items:center;
+}
+
+.btn-hw{
+    width: 43px; /* Reduzido de 55px para 45px */
+    height: 43px; /* Reduzido de 55px para 45px */
+    background: var(--panel-bg);
+    border-radius: 20%;
+    box-shadow: var(--shd-out);
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+/* COR ICONES botões */
+
+.btn-hw i{
+color:#c5c5c5;
+font-size:18px;
+}
+
+.btn-play-hw{
+width:85px;
+height:85px;
+background:var(--panel-bg);
+border-radius:50%;
+box-shadow:var(--shd-out);
+border:3px solid #5a5a5a;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+}
+
+/* COR BOTÃO INICIAR */
+
+.btn-play-hw i{
+color: #e3ffc3;
+font-size:32px;
+text-shadow: 0 0 15px #2c2e2a; /* O sombreado agora usa a mesma cor */
+}
+
+/* CORES TITULOS - modais */
+
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:var(--bg-main);
+padding:25px;
+overflow-y:auto;
+}
+
+input,textarea{
+width:100%;
+padding:12px;
+background:#1a1a1a;
+border:none;
+border-radius:10px;
+color:white;
+margin-bottom:10px;
+box-shadow:var(--shd-in);
+}
+
+.btn-save{
+background:var(--accent);
+color:#000000;
+padding:12px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+width:100%;
+cursor:pointer;
+}
+
+.btn-back{
+margin-top:20px;
+width:100%;
+background:none;
+border:1px solid #1a1919;
+color:#c4c0c0;
+padding:10px;
+cursor:pointer;
+}
+
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="display-box" id="caixa-pergunta" style="min-height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px;">
-            <div id="texto-pergunta" style="font-weight: bold; font-size: 1.8em; text-align: center; line-height: 1.2; width: 100%; word-wrap: break-word;">SELECIONE UMA PASTA E APERTE PLAY</div>
-            
-            <small id="texto-dica" style="display:none; color: #444; margin-top: 15px; font-style: italic; font-size: 1.1em; text-align: center; font-weight: bold;"></small>
-        </div>
 
-        <div class="sub-labels" style="display: flex; justify-content: space-around; margin: 10px 0; align-items: center;">
-            <button class="modo-btn modo-ativo" id="btn-modo-pergunta" onclick="trocarModo('pergunta')">PERGUNTA</button>
-            
-            <div style="display: flex; gap: 10px;">
-                <span id="label-romanizacao" style="font-size: 10px; color: #b1c7c2; font-weight: bold; cursor: pointer; border-bottom: 1px dashed #00664d;">ROMANIZAÇÃO</span>
-                <span id="label-ditado" onclick="alternarModoDitado()" style="font-size: 10px; color: #b1c7c2; font-weight: bold; cursor: pointer; border-bottom: 1px dashed #00664d;">DITADO</span>
-            </div>
+<div class="machine-display">
 
-            <button class="modo-btn" id="btn-modo-resposta" onclick="trocarModo('resposta')">RESPOSTA</button>
-        </div>
+<select id="tema-app" onchange="mudarTema()" style="margin-bottom:10px;width:120px;font-size:12px;">
+<option value="original">Original</option>
+<option value="cinza">Cinza claro</option>
+<option value="menta">Verde menta</option>
+</select>    
 
-        <div class="display-box" style="position: relative; padding-top: 25px; height: auto; min-height: 120px; display: flex; flex-direction: column; justify-content: center;">
-            <small id="indicador-lingua" style="position: absolute; top: 5px; left: 10px; font-size: 10px; color: #00664d; font-weight: bold;"></small>
-            
-            <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-                <input type="text" id="escrita-coreano" placeholder="Escreva em Coreano..." 
-                style="width: 90%; margin: 0 auto; padding: 12px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-weight: bold; font-size: 1,8em;">
-                
-                <div style="width: 90%; margin: 0 auto; display: flex; align-items: center; gap: 5px;">
-                    <input type="checkbox" id="chk-usar-portugues" title="Habilitar escrita em português">
-                    <input type="text" id="escrita-portugues" placeholder="Escreva em Português..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px; background-color: #f0f0f0;" disabled>
-                </div>
-            </div>
-        </div>
+<div id="coreano-txt">L-PRO</div>
+<div id="traducao-txt">READY</div>
 
-        <div class="botoes-audio" style="margin-top: 20px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; align-items: center;">
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
-                <button onclick="ouvirPergunta()" style="padding: 8px 12px;">OUVIR</button>
-                <span onclick="ouvirFraseLenta()" style="font-size: 9px; color: #b1c7c2; font-weight: bold; cursor: pointer; text-decoration: underline; text-transform: uppercase;">Lento</span>
-            </div>
+<select id="select-p"></select>
 
-            <button onclick="verificarResposta()" style="background: #28a745; color: white; padding: 8px 12px;">VERIFICAR</button>
-            <button id="btn-falar" onclick="reconhecerVoz()" style="background: #007bff; color: white; padding: 8px 12px;">FALAR</button>
-            <button onclick="abrirModoTreino()" style="background: #b1c7c2; color: #00664d; font-weight: bold; border: 1px solid #00664d; padding: 8px 12px;">TREINO</button>
-        </div>
-
-        <div class="footer" style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 30px;">
-            <select id="pasta-treino" onchange="resetarSequencia()" style="padding: 5px; border-radius: 5px; border: 1px solid #00664d; font-size: 10px; font-weight: bold;"></select>
-
-            <div style="display: flex; justify-content: space-around; width: 100%; align-items: center;">
-                <button onclick="abrirArquivos()">ARQUIVO</button>
-                <div class="btn-central" id="play-btn"></div> 
-                <button onclick="abrirGramatica()">GRAMÁTICA</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="tela-cadastro" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000;">
-        <div style="background:white; width:90%; margin:5% auto; padding:20px; border-radius:10px; max-height: 85vh; overflow-y: auto;">
-            <h2 id="titulo-arquivo" style="text-align:center; color:#00664d; margin-bottom: 10px;">GERENCIAR ARQUIVOS</h2>
-            <div style="background: #f0f7f5; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-                <input type="text" id="cad-pasta-nome" placeholder="Nome da Pasta (ex: DIALOGO 1)" style="width:94%; margin-bottom:8px; padding:8px;">
-                <div style="display: flex; gap: 5px; width: 98%;">
-                   <input type="number" id="cad-ordem" placeholder="Ordem (1, 2...)" style="width:30%; margin-bottom:8px; padding:8px;">
-                   <input type="text" id="cad-coreano" placeholder="Coreano" style="width:70%; margin-bottom:8px; padding:8px;">
-                </div>
-                <input type="text" id="cad-traducao" placeholder="Tradução" style="width:94%; margin-bottom:8px; padding:8px;">
-                <input type="text" id="cad-romanizacao" placeholder="Romanização" style="width:94%; margin-bottom:8px; padding:8px;">
-                <button id="btn-salvar-exercicio" onclick="salvarExercicioDinâmico()" style="width:100%; background:#28a745; color:white; padding:10px; border:none; border-radius:5px; font-weight:bold;">SALVAR EXERCÍCIO</button>
-            </div>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <button onclick="exportarDados()" class="btn-backup" style="background: #eefaf6; color: #00664d;">📤 EXPORTAR</button>
-                <button onclick="document.getElementById('input-importar').click()" class="btn-backup" style="background: #fff8e1; color: #856404;">📥 IMPORTAR</button>
-                <input type="file" id="input-importar" style="display:none" onchange="importarDados(this)">
-            </div>
-            <hr>
-            <div id="visualizacao-arquivos" style="margin-top:10px;"></div>
-            <button onclick="fecharCadastro()" style="width:100%; background:#ccc; padding:10px; border:none; border-radius:5px; margin-top:10px;">VOLTAR</button>
-        </div>
-    </div>
-
-    <div id="tela-gramatica" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000;">
-        <div style="background:white; width:90%; margin:5% auto; padding:20px; border-radius:10px; max-height: 80vh; overflow-y: auto;">
-            <h2 style="text-align:center; color:#00664d;">MINHA GRAMÁTICA</h2>
-            <input type="text" id="gram-titulo" placeholder="Nome da Pasta" style="width:94%; margin-bottom:10px; padding:8px;">
-            <textarea id="gram-texto" style="width:94%; height:80px; padding:8px;" placeholder="Explicação..."></textarea>
-            <button onclick="salvarNovaGramatica()" style="width:100%; background:#28a745; color:white; padding:10px; border-radius:5px;">SALVAR NOTA</button>
-            <div id="lista-gramatica" style="margin-top:15px;"></div>
-            <button onclick="fecharGramatica()" style="width:100%; background:#ccc; padding:10px; margin-top:10px; border-radius:5px;">FECHAR</button>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-    
-<div id="tela-treino-escolha" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; padding-top:50px; background:#00664d; z-index:2000; overflow-y: auto;">
-    <div class="container" style="background: none; box-shadow: none; padding-bottom:120px;">
-        <button onclick="fecharModoTreino()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 15px; border-radius: 5px; margin-bottom: 20px; cursor: pointer; font-weight: bold;">VOLTAR</button>
-
-        <div class="display-box" style="min-height: 45px; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px;">
-            <div id="pergunta-treino-pt" style="font-weight: bold; font-size: 1.4em; text-align: center; color: #00664d;">---</div>
-            
-            <div id="dica-coreano-treino" style="font-size: 2,0em; color: #4a635d; margin-top: 5px; font-weight: normal; font-style: italic;"></div>
-        </div>
-
-        <div id="grid-opcoes-coreano" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-            </div>
-
-        <div class="display-box" style="padding: 15px; min-height: auto; margin-bottom: 15px; text-align: center;">
-            <input type="text" id="input-treino-coreano" oninput="verificarEscritaTreino()" placeholder="Escolhe o quadrado e ESCREVE aqui..." 
-            style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-weight: bold; font-size: 1.0em;">
-            
-            <div id="traducao-resultado-treino" style="margin-top: 10px; font-weight: bold; color: #00664d; min-height: 20px;"></div>
-        </div>
-
-        <div class="botoes-audio" style="display: flex; justify-content: center; gap: 10px;">
-            <button onclick="ouvirLento()" style="background: white; color: #00664d;">OUVIR (LENTO)</button>
-            <button id="btn-falar-treino" onclick="reconhecerVozTreino()" style="background: #007bff; color: white;">FALAR</button>
-        </div>
-
-        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
-
-            <!-- Próximo exercício -->
-            <div class="btn-central" onclick="proximoExercicioDialogo()" 
-            style="cursor: pointer; width: 60px; height: 60px; border-radius: 50%; border: 3px solid #b1c7c2; display: flex; align-items: center; justify-content: center; background: #00664d;">
-                <span style="color: #b1c7c2; font-size: 24px;">➔</span>
-            </div>
-
-            <!-- Próxima página -->
-            <button onclick="irParaProximaPaginaTreino()" 
-            style="background:white; color:#00664d; font-weight:bold; padding:10px 15px; border-radius:8px; border:none;">
-                PRÓXIMA PÁGINA
-            </button>
-
-        </div>
-
-<div id="tela-dialogo-simulado" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; padding-top:35px; background:#00664d; z-index:3000; overflow-y: auto;">
-    <div class="container" style="background: none; box-shadow: none;">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <button onclick="voltarParaTreino()" style="background: white; color: #00664d; border: 2px solid #b1c7c2; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">VOLTAR</button>
-        </div>
-        <div class="display-box" style="background: white; border: 2px solid #000; padding: 20px; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-            <div id="pergunta-app-simulado" style="font-size: 1.8em; font-weight: bold; text-align: center; color: #333;">Aguardando...</div>
-            <div style="position: absolute; bottom: -25px; width: 100%; display: flex; justify-content: space-between; padding: 0 5px;">
-                <span onclick="revelarDicaSimulada('traducao')" style="font-size: 10px; color: #b1c7c2; cursor: pointer;">TRADUÇÃO</span>
-                <span onclick="revelarDicaSimulada('resposta')" style="font-size: 10px; color: #b1c7c2; cursor: pointer;">RESPOSTA</span>
-            </div>
-        </div>
-        <div id="area-dica-simulada" style="text-align: center; min-height: 40px; margin: 35px 0; color: #fff; font-weight: bold; font-style: italic;"></div>
-        <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 30px;">
-            <button onclick="ouvirPerguntaSimulada('normal')" style="background: white; color: #00664d; border: 2px solid #000; padding: 10px; font-weight: bold;">OUVIR</button>
-            <button onclick="ouvirPerguntaSimulada('lento')" style="background: white; color: #00664d; border: 1px solid #000; padding: 5px; font-size: 10px;">OUVIR LENTO</button>
-            <button id="btn-falar-simulado" onclick="reconhecerVozSimulada()" style="background: white; color: #00664d; border: 2px solid #000; padding: 10px; font-weight: bold;">FALAR</button>
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
-            <div onclick="proximoPassoSimulado()" style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid #b1c7c2; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #00664d;">
-                <span style="color: #b1c7c2; font-size: 30px;">◯</span>
-            </div>
-            <button onclick="abrirAssociacao()" style="background: white; color: #00664d; font-weight: bold; padding: 8px 15px; border-radius: 8px; border: none; cursor: pointer;">PRÓXIMA PÁGINA</button>
-        </div>
-    </div>
 </div>
 
-<div id="tela-associacao" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; padding-top:35px; background:#00664d; z-index:4000; overflow-y: auto;">
-    <div class="container" style="background: none; box-shadow: none; padding-top: 20px; padding-bottom: 30px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <button onclick="fecharAssociacao()" style="background: white; color: #00664d; border: 2px solid #b1c7c2; padding: 5px 15px; border-radius: 5px; font-weight: bold;">VOLTAR</button>
-            <select id="pasta-associacao" onchange="iniciarAssociacao()" style="padding: 5px; border-radius: 5px;"></select>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
-            <div id="coluna-perguntas" style="display: flex; flex-direction: column; gap: 10px;"></div>
-            <div id="coluna-respostas" style="display: flex; flex-direction: column; gap: 10px;"></div>
-        </div>
-        <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px;">
-    <button onclick="iniciarAssociacao()" style="background: white; color: #00664d; font-weight: bold; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;">
-        TROCAR EXERCÍCIO
-    </button>
-    
-    <button onclick="abrirMontarFrase()" style="background: white; color: #00664d; font-weight: bold; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;">
-        PRÓXIMA PÁGINA (MONTAR FRASE)
+<div class="bottom-nav">
+
+<button class="btn-hw" onclick="abrir('tela-arquivo')">
+<i class="fas fa-database"></i>
 </button>
-</div>
+
+<button class="btn-hw" onclick="abrir('tela-gramatica')">
+<i class="fas fa-book"></i>
+</button>
+
+<button class="btn-hw">
+<i class="fas fa-cog"></i> 
+</button>
+
+<button class="btn-play-hw" onclick="abrir('tela-dialogo')">
+<i class="fas fa-play"></i>
+</button>
+
+<button class="btn-hw" onclick="abrir('tela-treino-escrita'); iniciarTreinoEscrita();">
+<i class="fas fa-heart"></i> 
+</button>
+
+<button class="btn-hw">
+<i class="fas fa-layer-group"></i>
+</button>
+
+<button class="btn-hw">
+<i class="fas fa-pen-nib"></i>
+</button>
 
 </div>
-</div>
 
-<div id="tela-montar-frase" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#00664d; z-index:5000; overflow-y:auto;">
-    <div class="container" style="background:none; box-shadow:none; margin-top:20px;">
-
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <button onclick="voltarParaAssociacao()" 
-            style="background:white; color:#00664d; border:2px solid #b1c7c2; padding:5px 15px; border-radius:5px; font-weight:bold;">
-                VOLTAR
-            </button>
-
-            <select id="pasta-montar-frase" onchange="iniciarMontarFrase()" 
-            style="padding:5px; border-radius:5px;"></select>
-        </div>
-
-        <div class="display-box" style="text-align:center; margin-bottom:20px;">
-            <div id="pergunta-montar-pt" style="font-weight:bold; font-size:1.4em;"></div>
-        </div>
-
-        <div id="area-palavras" 
-        style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px;"></div>
-
-        <div id="area-resposta" 
-        style="min-height:60px; background:white; border-radius:10px; padding:10px; margin-bottom:20px; text-align:center;">
-        </div>
-
-        <div style="display:flex; justify-content:center; gap:10px;">
-    <button onclick="verificarMontagem()" style="background:#28a745; color:white;">VERIFICAR</button>
-
-    <button onclick="voltarUltimaPalavra()" style="background:#ffc107; color:#000;">
-        VOLTAR PALAVRA
+<div id="controles-rapidos" style="display:none; margin-top: 15px; display: flex; gap: 15px;">
+    <button class="btn-hw" onclick="pausarDialogo()" style="width: 40px; height: 40px;">
+        <i class="fas fa-pause"></i>
     </button>
-
-    <button onclick="proximaMontagem()" style="background:white; color:#00664d;">
-        PRÓXIMA
-    </button>
-
-    <button id="btn-refazer-montagem"
-        onclick="refazerExercicioMontagem()"
-        style="display:none; background:#ff7043; color:white;">
-        REFAZER
+    <button class="btn-hw" onclick="iniciarDialogo()" style="width: 40px; height: 40px;">
+        <i class="fas fa-play"></i>
     </button>
 </div>
+<!-- ARQUIVO -->
+
+<div id="tela-arquivo" class="modal">
+
+<h2>Cadastro Exercício</h2>
+
+<input id="in-p" placeholder="Nome da Pasta">
+<input id="in-c" placeholder="Frase idioma alvo">
+<input id="in-t" placeholder="Tradução">
+<input id="in-r" placeholder="Romanização">
+<input id="in-o" placeholder="Ordem (1,2,3...)">
+
+<button class="btn-save" onclick="salvarExercicio()">SALVAR</button>
+
+<button class="btn-save" onclick="exportarDB()">EXPORTAR BANCO</button>
+
+<input type="file" id="file-import" style="display:none" onchange="importarDB(event)">
+<button class="btn-save" onclick="document.getElementById('file-import').click()">IMPORTAR BANCO</button>
+
+<button class="btn-back" onclick="fechar()">VOLTAR</button>
+<h3>Pastas cadastradas</h3>
+<div id="lista-pastas"></div>
+<button class="btn-back" onclick="fechar()">VOLTAR</button>
+
+
+</div>
+
+<!-- GRAMATICA -->
+
+<div id="tela-gramatica" class="modal">
+
+<h2>Cadastro Gramática</h2>
+
+<input id="gram-titulo" placeholder="Título">
+<textarea id="gram-desc" placeholder="Explicação"></textarea>
+
+<button class="btn-save" onclick="salvarGramatica()">SALVAR</button>
+
+<button class="btn-back" onclick="fechar()">VOLTAR</button>
+
+</div>
+
+<!-- DIALOGO VOZ -->
+
+<div id="tela-dialogo" class="modal">
+
+<h2>Treino de Diálogo</h2>
+
+<label>Pasta de exercícios</label>
+<select id="select-dialogo"></select>
+
+<br><br>
+
+<label>Idioma da voz</label>
+<select id="idioma-voz">
+
+<option value="ko-KR">Coreano</option>
+<option value="ja-JP">Japonês</option>
+<option value="en-US">Inglês</option>
+<option value="fr-FR">Francês</option>
+<option value="es-ES">Espanhol</option>
+<option value="de-DE">Alemão</option>
+<option value="it-IT">Italiano</option>
+<option value="pt-BR">Português</option>
+
+</select>
+
+<br><br>
+
+<label>Velocidade da voz</label>
+<input type="range" id="velocidade" min="0.5" max="1.5" step="0.1" value="1">
+
+<br><br>
+
+<label>Tempo entre frases</label>
+<select id="tempo">
+<option value="2000">2 segundos</option>
+<option value="3000">3 segundos</option>
+<option value="4000">4 segundos</option>
+<option value="5000">5 segundos</option>
+<option value="6000">6 segundos</option>
+<option value="7000">7 segundos</option>
+<option value="8000">8 segundos</option>
+<option value="9000">9 segundos</option>
+<option value="10000">10 segundos</option>
+<option value="10000">12 segundos</option>
+<option value="10000">15 segundos</option>
+<option value="10000">20 segundos</option>
+</select>
+
+<br><br>
+
+<button class="btn-save" onclick="iniciarDialogo()">INICIAR</button>
+<button class="btn-save" onclick="pausarDialogo()">PAUSAR</button>
+
+<button class="btn-back" onclick="fechar()">VOLTAR</button>
+
+</div>
+
+<!-- TELA TREINO ESCRITA -->
+
+<div id="tela-treino-escrita" class="modal">
+    <h2>Treino de Montagem</h2>
+    
+    <div class="machine-display">
+        <div id="display-baloes-treino" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <div class="balao-coreano" onclick="falarTreino(1.0)" style="cursor:pointer; background: var(--panel-bg);">
+                <h1 id="escrita-pergunta" style="margin:0; font-size: 22px; color: #fff;">...</h1>
+            </div>
+            
+            <div class="balao-traducao">
+                <p id="escrita-dica" style="margin:0; min-height: 1.2em; color: var(--accent);"></p>
+            </div>
+        </div>
+
+        <div style="margin-top: 15px; display: flex; gap: 25px; font-size: 20px;">
+            <i class="fas fa-volume-up" onclick="falarTreino(1.0)" style="cursor:pointer; color:var(--accent)"></i>
+            <i class="fas fa-snail" onclick="falarTreino(0.5)" style="cursor:pointer; color:#ffcc00"></i>
+        </div>
+    </div>
+
+    <div id="container-palavras" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 25px; min-height: 60px;"></div>
+
+    <input type="text" id="campo-resposta" placeholder="Toque nos balões para montar..." 
+           style="width: 100%; padding: 15px; border-radius: 10px; border: none; background: var(--shd-in); color: var(--accent); margin-top: 20px; text-align: center; font-weight: bold;" readonly>
+
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <button class="btn-save" onclick="verificarResposta()" style="flex: 1.5;">VERIFICAR</button>
+        
+        <button class="btn-save" onclick="voltarPalavra()" style="flex: 1; background: #555;">
+            <i class="fas fa-undo"></i> VOLTAR
+        </button>
+        
+        <button class="btn-save" onclick="limparResposta()" style="flex: 1; background: #333;">LIMPAR</button>
+    </div>
+
+    <button class="btn-back" onclick="fechar()" style="margin-top: 30px;">VOLTAR</button>
+</div>
+
+<script>
+
+function falarTreino(velocidade) {
+    // Pega o texto da pergunta ou o item atual da lista de treino
+    let texto = listaTreino[indiceTreino].coreano; 
+    
+    if(!texto) return;
+
+    speechSynthesis.cancel(); 
+
+    let msg = new SpeechSynthesisUtterance(texto);
+    msg.lang = document.getElementById("idioma-voz").value;
+    msg.rate = velocidade; 
+    
+    speechSynthesis.speak(msg);
+}    
+
+/* BANCO */
+
+let banco={}
+let gramatica=[]
+
+/* INIT */
+
+window.onload=()=>{
+
+let db=localStorage.getItem("db")
+let gr=localStorage.getItem("gram")
+
+if(db) banco=JSON.parse(db)
+if(gr) gramatica=JSON.parse(gr)
+
+atualizarPastas()
+
+}
+
+
+/* UI */
+
+function abrir(id){
+
+document.getElementById(id).style.display="block"
+
+}
+
+function fechar(){
+
+document.querySelectorAll(".modal").forEach(m=>m.style.display="none")
+
+}
+
+/* SALVAR EXERCICIO */
+
+function salvarExercicio(){
+
+let pasta=document.getElementById("in-p").value.trim()
+let coreano=document.getElementById("in-c").value.trim()
+let traducao=document.getElementById("in-t").value.trim()
+let romanizacao=document.getElementById("in-r").value.trim()
+let ordem=parseInt(document.getElementById("in-o").value)
+
+if(!pasta||!coreano||!traducao){
+alert("Preencha tudo")
+return
+}
+
+if(!banco[pasta]) banco[pasta]=[]
+
+banco[pasta].push({
+ordem:ordem||banco[pasta].length+1,
+coreano,
+traducao,
+romanizacao
+})
+
+localStorage.setItem("db",JSON.stringify(banco))
+
+atualizarPastas()
+
+alert("Salvo")
+
+}
+
+/* PASTAS */
+
+function atualizarPastas(){
+
+/* atualizar seletor da pagina principal */
+
+let seletorPrincipal = document.getElementById("select-p")
+
+if(seletorPrincipal){
+
+seletorPrincipal.innerHTML=""
+
+for(let pasta in banco){
+
+let opt=document.createElement("option")
+opt.value=pasta
+opt.textContent=pasta
+
+seletorPrincipal.appendChild(opt)
+
+}
+
+}
+
+
+/* atualizar seletor do dialogo */
+
+let seletorDialogo = document.getElementById("select-dialogo")
+
+if(seletorDialogo){
+
+seletorDialogo.innerHTML=""
+
+for(let pasta in banco){
+
+let opt=document.createElement("option")
+opt.value=pasta
+opt.textContent=pasta
+
+seletorDialogo.appendChild(opt)
+
+}
+
+}
+
+
+/* atualizar lista visual da tela arquivo */
+
+mostrarPastasArquivo()
+
+}
+
+function mostrarPastasArquivo(){
+
+let area = document.getElementById("lista-pastas")
+
+if(!area) return
+
+area.innerHTML=""
+
+for(let pasta in banco){
+
+let linha = document.createElement("div")
+
+linha.style.marginBottom="10px"
+
+linha.innerHTML = `
+<label>
+<input type="checkbox" onchange="marcarEstudado('${pasta}',this.checked)">
+${pasta}
+</label>
+
+<button onclick="editarPasta('${pasta}')">Editar itens</button>
+
+<button onclick="apagarPasta('${pasta}')">Apagar pasta</button>
+`
+
+area.appendChild(linha)
+
+}
+
+}
+
+/* VOZ */
+
+function falar(txt){
+
+let msg=new SpeechSynthesisUtterance(txt)
+
+msg.lang=document.getElementById("idioma-voz").value
+
+let vel=document.getElementById("velocidade").value
+msg.rate=vel
+
+speechSynthesis.speak(msg)
+
+}
+
+/* PLAY PASTA */
+
+function playVoz(){
+
+let pasta=document.getElementById("select-p").value
+
+if(!banco[pasta]){
+alert("Pasta vazia")
+return
+}
+
+let lista=banco[pasta]
+
+let i=0
+
+function loop(){
+
+if(i>=lista.length) return
+
+let item=lista[i]
+
+document.getElementById("coreano-txt").innerText=item.coreano
+document.getElementById("traducao-txt").innerText=item.traducao
+
+falar(item.coreano)
+
+i++
+
+setTimeout(loop,2500)
+
+}
+
+loop()
+
+}
+
+/* GRAMATICA */
+
+function salvarGramatica(){
+
+let titulo=document.getElementById("gram-titulo").value
+let desc=document.getElementById("gram-desc").value
+
+gramatica.push({titulo,desc})
+
+localStorage.setItem("gram",JSON.stringify(gramatica))
+
+alert("Regra salva")
+
+}
+
+/* EXPORTAR BANCO */
+
+function exportarDB(){
+
+let dados={
+exercicios:banco,
+gramatica:gramatica
+}
+
+let json=JSON.stringify(dados,null,2)
+
+let blob=new Blob([json],{type:"application/json"})
+
+let url=URL.createObjectURL(blob)
+
+let a=document.createElement("a")
+
+a.href=url
+a.download="LPRO_BANCO.json"
+
+a.click()
+
+}
+
+/* IMPORTAR BANCO */
+
+function importarDB(event){
+
+let file=event.target.files[0]
+
+if(!file) return
+
+let reader=new FileReader()
+
+reader.onload=function(e){
+
+let dados=JSON.parse(e.target.result)
+
+if(dados.exercicios){
+
+for(let pasta in dados.exercicios){
+
+if(!banco[pasta]){
+banco[pasta]=[]
+}
+
+banco[pasta]=banco[pasta].concat(dados.exercicios[pasta])
+
+}
+
+}
+
+if(dados.gramatica) gramatica=dados.gramatica
+
+localStorage.setItem("db",JSON.stringify(banco))
+localStorage.setItem("gram",JSON.stringify(gramatica))
+
+atualizarPastas()
+
+alert("Banco importado com sucesso")
+
+}
+
+reader.readAsText(file)
+
+}
+
+let dialogoRodando=false
+let indiceDialogo=0
+
+function iniciarDialogo(){
+
+let pasta=document.getElementById("select-dialogo").value
+
+if(!banco[pasta]){
+alert("Sem exercícios")
+return
+}
+
+dialogoRodando=true
+indiceDialogo=0
+
+let lista=banco[pasta]
+
+let velocidade=document.getElementById("velocidade").value
+let tempo=parseInt(document.getElementById("tempo").value)
+
+function loop(){
+
+if(!dialogoRodando) return
+
+if(indiceDialogo>=lista.length){
+indiceDialogo=0
+}
+
+let item=lista[indiceDialogo]
+
+/* atualizar display */
+
+document.getElementById("coreano-txt").innerText=item.coreano
+document.getElementById("traducao-txt").innerText=item.traducao
+
+/* criar voz */
+
+let msg=new SpeechSynthesisUtterance(item.coreano)
+msg.lang=document.getElementById("idioma-voz").value
+msg.rate=velocidade
+
+/* quando a fala terminar */
+
+msg.onend=function(){
+
+indiceDialogo++
+
+setTimeout(loop,tempo)
+
+}
+
+speechSynthesis.speak(msg)
+
+}
+
+loop()
+
+}
+
+function pausarDialogo(){
+
+dialogoRodando=false
+speechSynthesis.cancel()
+
+}
+
+/* VARIÁVEIS DO TREINO DE ESCRITA */
+let listaTreino = [];
+let indiceTreino = 0;
+
+function iniciarTreinoEscrita() {
+    let pasta = document.getElementById("select-p").value; // Pega a pasta da tela principal
+
+    if (!banco[pasta] || banco[pasta].length === 0) {
+        alert("Selecione uma pasta com exercícios primeiro!");
+        fechar();
+        return;
+    }
+
+    // Prepara a lista e embaralha (opcional, mas bom para treinar)
+    listaTreino = [...banco[pasta]];
+    indiceTreino = 0;
+    
+    proximaQuestao();
+}
+
+function proximaQuestao() {
+    if (indiceTreino >= listaTreino.length) {
+        alert("Treino concluído! Parabéns! 🎉");
+        fechar();
+        return;
+    }
+
+    let item = listaTreino[indiceTreino];
+    
+    // 1. Mostra a tradução (Português) no balão principal
+    document.getElementById("escrita-pergunta").innerText = item.traducao;
+    document.getElementById("escrita-dica").innerText = ""; 
+    document.getElementById("campo-resposta").value = "";
+
+    // 2. Gera os balões pequenos com o idioma alvo (Ex: Coreano)
+    gerarBaloesPalavras(item.coreano);
+    
+    // 3. Opcional: Fala a frase automaticamente ao começar (Velocidade Normal)
+    setTimeout(() => falarTreino(1.0), 500);
+}
+
+function gerarBaloesPalavras(frase) {
+    let container = document.getElementById("container-palavras");
+    container.innerHTML = "";
+    
+    // Divide a frase em palavras e embaralha
+    let palavras = frase.split(" ").sort(() => Math.random() - 0.5);
+
+    palavras.forEach(palavra => {
+        let btn = document.createElement("button");
+        btn.innerText = palavra;
+        
+        // Estilo Neumórfico (Mantido)
+        btn.style.padding = "10px 18px";
+        btn.style.border = "none";
+        btn.style.borderRadius = "15px";
+        btn.style.background = "var(--panel-bg)";
+        btn.style.boxShadow = "var(--shd-out)";
+        btn.style.color = "white";
+        btn.style.cursor = "pointer";
+        btn.style.fontSize = "16px";
+        
+        btn.onclick = () => {
+            // 1. Falar a palavra clicada (no idioma alvo)
+            falarPalavraIndividual(palavra);
+
+            // 2. Adicionar ao campo de resposta
+            let campo = document.getElementById("campo-resposta");
+            campo.value += (campo.value ? " " : "") + palavra;
+            
+            // 3. Efeito visual de desabilitado
+            btn.style.opacity = "0.2";
+            btn.style.pointerEvents = "none"; 
+        };
+        container.appendChild(btn);
+    });
+}
+
+// Nova função auxiliar para falar apenas a palavra do balão pequeno
+function falarPalavraIndividual(palavra) {
+    speechSynthesis.cancel(); // Para a fala anterior para não embolar
+    let msg = new SpeechSynthesisUtterance(palavra);
+    msg.lang = document.getElementById("idioma-voz").value || "ko-KR";
+    msg.rate = 0.8; // Uma velocidade levemente mais lenta para clareza
+    speechSynthesis.speak(msg);
+}
+
+function falarTreino(velocidade) {
+    let item = listaTreino[indiceTreino];
+    if(!item) return;
+
+    speechSynthesis.cancel(); 
+    let msg = new SpeechSynthesisUtterance(item.coreano);
+    
+    // Pega o idioma selecionado na tela de diálogo (ex: ko-KR)
+    msg.lang = document.getElementById("idioma-voz").value || "ko-KR";
+    msg.rate = velocidade; 
+    
+    speechSynthesis.speak(msg);
+}
+
+function verificarResposta() {
+    let usuario = document.getElementById("campo-resposta").value.trim();
+    let correto = listaTreino[indiceTreino].coreano.trim();
+
+    if(usuario === correto) {
+        alert("Correto! Vamos para a próxima.");
+        indiceTreino++;
+        proximaQuestao();
+    } else {
+        alert("Ops! A ordem está diferente. Tente de novo.");
+        limparResposta();
+    }
+}
+
+function limparResposta() {
+    document.getElementById("campo-resposta").value = "";
+    gerarBaloesPalavras(listaTreino[indiceTreino].coreano);
+}
+function apagarPasta(nomePasta){
+
+let confirmar = confirm("Apagar a pasta '"+nomePasta+"' e todos os exercícios?")
+
+if(!confirmar) return
+
+delete banco[nomePasta]
+
+localStorage.setItem("db",JSON.stringify(banco))
+
+atualizarPastas()
+
+alert("Pasta apagada")
+
+}
+
+function editarPasta(nomePasta){
+
+let lista=banco[nomePasta]
+
+if(!lista || lista.length==0){
+alert("Pasta vazia")
+return
+}
+
+let texto="EXERCÍCIOS DA PASTA: "+nomePasta+"\n\n"
+
+lista.forEach((item,i)=>{
+
+texto += (i+1)+" - "+item.coreano+" / "+item.traducao+"\n"
+
+})
+
+alert(texto)
+
+}
+
+function marcarEstudado(pasta,estado){
+
+localStorage.setItem("estudado_"+pasta,estado)
+
+}
+
+function mudarTema(){
+
+let tema=document.getElementById("tema-app").value
+let root=document.documentElement
+
+/* MUDAR COR DO APP */
+
+if(tema==="original"){
+
+root.style.setProperty("--bg-main","#2a2a2a")
+root.style.setProperty("--panel-bg","#2a2a2a")
+root.style.setProperty("--shd-out","8px 8px 16px #1b1b1b,-6px -6px 14px #393939")
+root.style.setProperty("--shd-in","inset 3px 3px 7px #1b1b1b,inset -3px -3px 7px #393939")
+
+}
+
+if(tema==="cinza"){
+
+root.style.setProperty("--bg-main","#3f3f3f")
+root.style.setProperty("--panel-bg","#4f4f4f")
+root.style.setProperty("--shd-out","8px 8px 16px #3e3e3e,-6px -6px 14px #6a6a6a")
+root.style.setProperty("--shd-in","inset 3px 3px 7px #2e2e2e,inset -3px -3px 7px #5a5a5a")
+
+}
+
+if(tema==="menta"){
+
+root.style.setProperty("--bg-main","#45645c")
+root.style.setProperty("--panel-bg","#5f8b7f")
+root.style.setProperty("--shd-out","8px 8px 16px #3c574f,-6px -6px 14px #6e998d")
+root.style.setProperty("--shd-in","inset 3px 3px 7px #1d362e,inset -3px -3px 7px #305349")
+
+}
+
+localStorage.setItem("temaApp",tema)
+
+}
+
+// Variável para guardar a ordem dos botões clicados (coloque no topo do script)
+let historicoBaloes = [];
+
+function gerarBaloesPalavras(frase) {
+    let container = document.getElementById("container-palavras");
+    container.innerHTML = "";
+    historicoBaloes = []; // Reseta o histórico ao iniciar nova questão
+
+    let palavras = frase.split(" ").sort(() => Math.random() - 0.5);
+
+    palavras.forEach((palavra, index) => {
+        let btn = document.createElement("button");
+        btn.innerText = palavra;
+        btn.id = "btn-palavra-" + index; // ID único para podermos reabilitar depois
+        
+        // Estilo mantido
+        btn.style.padding = "10px 18px";
+        btn.style.border = "none";
+        btn.style.borderRadius = "15px";
+        btn.style.background = "var(--panel-bg)";
+        btn.style.boxShadow = "var(--shd-out)";
+        btn.style.color = "white";
+        btn.style.fontSize = "16px";
+        
+        btn.onclick = () => {
+            falarPalavraIndividual(palavra);
+            let campo = document.getElementById("campo-resposta");
+            campo.value += (campo.value ? " " : "") + palavra;
+            
+            btn.style.opacity = "0.2";
+            btn.style.pointerEvents = "none";
+
+            // Guarda qual botão foi clicado para o "Voltar" saber qual reativar
+            historicoBaloes.push(btn.id);
+        };
+        container.appendChild(btn);
+    });
+}
+
+function voltarPalavra() {
+    if (historicoBaloes.length === 0) return;
+
+    // 1. Pega o ID do último botão clicado e reabilita ele
+    let ultimoId = historicoBaloes.pop();
+    let btn = document.getElementById(ultimoId);
+    if (btn) {
+        btn.style.opacity = "1";
+        btn.style.pointerEvents = "auto";
+    }
+
+    // 2. Remove a última palavra do campo de texto
+    let campo = document.getElementById("campo-resposta");
+    let palavrasAtuais = campo.value.trim().split(" ");
+    palavrasAtuais.pop(); // Remove o último item do array
+    
+    campo.value = palavrasAtuais.join(" ");
+}
+
+</script>
 
 </body>
 </html>
