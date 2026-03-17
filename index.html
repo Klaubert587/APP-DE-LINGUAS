@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>L-PRO Industrial</title>
+<title>KLARETTU</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -188,7 +188,7 @@ cursor:pointer;
 <option value="menta">Verde menta</option>
 </select>    
 
-<div id="coreano-txt">L-PRO</div>
+<div id="coreano-txt">KLARETTU</div>
 <div id="traducao-txt">READY</div>
 
 <select id="select-p"></select>
@@ -196,45 +196,45 @@ cursor:pointer;
 </div>
 
 <div class="bottom-nav">
+    <button class="btn-hw" onclick="abrir('tela-arquivo')">
+        <i class="fas fa-database"></i>
+    </button>
 
-<button class="btn-hw" onclick="abrir('tela-arquivo')">
-<i class="fas fa-database"></i>
-</button>
+    <button class="btn-hw" onclick="abrir('tela-gramatica')">
+        <i class="fas fa-book"></i>
+    </button>
 
-<button class="btn-hw" onclick="abrir('tela-gramatica')">
-<i class="fas fa-book"></i>
-</button>
+    <button class="btn-hw">
+        <i class="fas fa-cog"></i> 
+    </button>
 
-<button class="btn-hw">
-<i class="fas fa-cog"></i> 
-</button>
+    <button class="btn-play-hw" onclick="abrir('tela-dialogo')">
+        <i class="fas fa-play"></i>
+    </button>
 
-<button class="btn-play-hw" onclick="abrir('tela-dialogo')">
-<i class="fas fa-play"></i>
-</button>
+    <button class="btn-hw" onclick="abrir('tela-treino-escrita'); iniciarTreinoEscrita();">
+        <i class="fas fa-heart"></i> 
+    </button>
 
-<button class="btn-hw" onclick="abrir('tela-treino-escrita'); iniciarTreinoEscrita();">
-<i class="fas fa-heart"></i> 
-</button>
+    <button class="btn-hw">
+        <i class="fas fa-layer-group"></i>
+    </button>
 
-<button class="btn-hw">
-<i class="fas fa-layer-group"></i>
-</button>
-
-<button class="btn-hw">
-<i class="fas fa-pen-nib"></i>
-</button>
-
+    <button class="btn-hw" onclick="abrirDitadoConfig()">
+        <i class="fas fa-pen-nib"></i>
+    </button>
 </div>
 
-<div id="controles-rapidos" style="display:none; margin-top: 15px; display: flex; gap: 15px;">
+<div id="controles-rapidos" style="display: flex; margin-top: 15px; gap: 15px;">
     <button class="btn-hw" onclick="pausarDialogo()" style="width: 40px; height: 40px;">
         <i class="fas fa-pause"></i>
     </button>
-    <button class="btn-hw" onclick="iniciarDialogo()" style="width: 40px; height: 40px;">
+    
+    <button class="btn-hw" onclick="iniciarDialogo(false)" style="width: 40px; height: 40px;">
         <i class="fas fa-play"></i>
     </button>
 </div>
+
 <!-- ARQUIVO -->
 
 <div id="tela-arquivo" class="modal">
@@ -275,6 +275,28 @@ cursor:pointer;
 
 <button class="btn-back" onclick="fechar()">VOLTAR</button>
 
+</div>
+<div id="tela-ditado" class="modal">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <label>Velocidade: </label>
+        <input type="range" id="speed" min="0.5" max="1.5" step="0.1" value="1" style="width: 100px;">
+    </div>
+    
+    <div id="ditado-frase" style="font-size: 24px; text-align: center; margin: 20px 0; min-height: 40px; color: var(--accent);">Carregando...</div>
+    
+    <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 20px;">
+        <i class="fas fa-volume-up" onclick="reproduzirDitado()" style="cursor: pointer; font-size: 32px; color: white;"></i>
+        <i class="fas fa-eye-slash" onclick="toggleVisibilidade()" style="cursor: pointer; font-size: 32px; color: white;"></i>
+    </div>
+
+    <textarea id="in-user-input" style="height: 150px; width: 90%; margin: 0 auto; display: block;" placeholder="Digite aqui..."></textarea>
+
+    <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+        <button class="btn-hw" onclick="fechar()"><i class="fas fa-times"></i></button>
+        <button class="btn-hw" onclick="anteriorDitado()"><i class="fas fa-arrow-left"></i></button>
+        <button class="btn-hw" onclick="verificarDitado()"><i class="fas fa-check"></i></button>
+        <button class="btn-hw" onclick="proximoDitado()"><i class="fas fa-arrow-right"></i></button>
+    </div>
 </div>
 
 <!-- DIALOGO VOZ -->
@@ -673,70 +695,66 @@ reader.readAsText(file)
 
 }
 
-let dialogoRodando=false
-let indiceDialogo=0
+/* CONTROLE DE DIÁLOGO (PLAY/PAUSE/INICIAR) */
+let dialogoRodando = false;
+let indiceDialogo = 0; 
 
-function iniciarDialogo(){
+// Agora a função aceita o comando 'resetar'
+function iniciarDialogo(resetar = true) {
+    let pasta = document.getElementById("select-dialogo").value;
 
-let pasta=document.getElementById("select-dialogo").value
+    if (!banco[pasta]) {
+        alert("Sem exercícios");
+        return;
+    }
 
-if(!banco[pasta]){
-alert("Sem exercícios")
-return
+    // Se resetar for true (botão INICIAR), volta para o 0.
+    // Se for false (botão PLAY da home), mantém o índice atual.
+    if (resetar) {
+        indiceDialogo = 0;
+    }
+
+    dialogoRodando = true;
+    let lista = banco[pasta];
+    let velocidade = document.getElementById("velocidade").value;
+    let tempo = parseInt(document.getElementById("tempo").value);
+
+    function loop() {
+        if (!dialogoRodando) return;
+
+        // Se chegar ao fim da pasta, reinicia o ciclo
+        if (indiceDialogo >= lista.length) {
+            indiceDialogo = 0;
+        }
+
+        let item = lista[indiceDialogo];
+
+        /* Atualizar Display */
+        document.getElementById("coreano-txt").innerText = item.coreano;
+        document.getElementById("traducao-txt").innerText = item.traducao;
+
+        /* Criar Voz */
+        let msg = new SpeechSynthesisUtterance(item.coreano);
+        msg.lang = document.getElementById("idioma-voz").value;
+        msg.rate = velocidade;
+
+        /* Quando a fala terminar */
+        msg.onend = function() {
+            if (dialogoRodando) {
+                indiceDialogo++;
+                setTimeout(loop, tempo);
+            }
+        };
+
+        speechSynthesis.speak(msg);
+    }
+
+    loop();
 }
 
-dialogoRodando=true
-indiceDialogo=0
-
-let lista=banco[pasta]
-
-let velocidade=document.getElementById("velocidade").value
-let tempo=parseInt(document.getElementById("tempo").value)
-
-function loop(){
-
-if(!dialogoRodando) return
-
-if(indiceDialogo>=lista.length){
-indiceDialogo=0
-}
-
-let item=lista[indiceDialogo]
-
-/* atualizar display */
-
-document.getElementById("coreano-txt").innerText=item.coreano
-document.getElementById("traducao-txt").innerText=item.traducao
-
-/* criar voz */
-
-let msg=new SpeechSynthesisUtterance(item.coreano)
-msg.lang=document.getElementById("idioma-voz").value
-msg.rate=velocidade
-
-/* quando a fala terminar */
-
-msg.onend=function(){
-
-indiceDialogo++
-
-setTimeout(loop,tempo)
-
-}
-
-speechSynthesis.speak(msg)
-
-}
-
-loop()
-
-}
-
-function pausarDialogo(){
-
-dialogoRodando=false
-speechSynthesis.cancel()
-
+function pausarDialogo() {
+    dialogoRodando = false;
+    speechSynthesis.cancel();
 }
 
 /* VARIÁVEIS DO TREINO DE ESCRITA */
@@ -995,6 +1013,80 @@ function voltarPalavra() {
     palavrasAtuais.pop(); // Remove o último item do array
     
     campo.value = palavrasAtuais.join(" ");
+}
+
+function abrirDitadoConfig() {
+    let pasta = document.getElementById("select-p").value;
+    if (!banco[pasta] || banco[pasta].length === 0) {
+        alert("Selecione uma pasta com exercícios primeiro!");
+        return;
+    }
+    abrir('tela-ditado');
+    indiceDitado = 0; 
+    carregarFraseDitado();
+}
+
+function carregarFraseDitado() {
+    let pasta = document.getElementById("select-p").value;
+    let lista = banco[pasta];
+    
+    if(!lista || lista.length === 0) {
+        document.getElementById("ditado-frase").innerText = "Pasta vazia!";
+        return;
+    }
+    
+    // Atualiza o texto na tela
+    document.getElementById("ditado-frase").innerText = lista[indiceDitado].coreano;
+    document.getElementById("ditado-frase").style.visibility = "visible";
+    document.getElementById("in-user-input").value = "";
+}
+
+function reproduzirDitado() {
+    let txt = document.getElementById("ditado-frase").innerText;
+    let msg = new SpeechSynthesisUtterance(txt);
+    msg.lang = "ko-KR"; // Coreano
+    msg.rate = document.getElementById("speed").value;
+    speechSynthesis.speak(msg);
+}
+
+function toggleVisibilidade() {
+    let el = document.getElementById("ditado-frase");
+    
+    // Verificamos se está escondido ou visível
+    if (el.style.opacity === "0") {
+        el.style.opacity = "1"; // Mostra o texto
+    } else {
+        el.style.opacity = "0"; // Esconde o texto, mas ele continua lá "tocando" o áudio
+    }
+}
+
+function proximoDitado() {
+    let pasta = document.getElementById("select-p").value;
+    let lista = banco[pasta];
+    if (indiceDitado < lista.length - 1) {
+        indiceDitado++;
+        carregarFraseDitado();
+    } else {
+        alert("Fim das frases!");
+    }
+}
+
+function anteriorDitado() {
+    if (indiceDitado > 0) {
+        indiceDitado--;
+        carregarFraseDitado();
+    }
+}
+
+function verificarDitado() {
+    let original = document.getElementById("ditado-frase").innerText;
+    let digitado = document.getElementById("in-user-input").value.trim();
+    
+    if(original === digitado) {
+        alert("Correto! Parabéns.");
+    } else {
+        alert("Ops! Tente novamente.\nA frase era: " + original);
+    }
 }
 
 </script>
